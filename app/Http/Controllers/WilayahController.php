@@ -32,7 +32,9 @@ class WilayahController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'Provinsi' => 'required|string|max:100',
-            'Kabupaten' => 'required|string|max:100'
+            'Kabupaten' => 'required|string|max:100',
+            'nama_wilayah' => 'nullable|string|max:200',
+            'status_aktif' => 'boolean'
         ]);
 
         if ($validator->fails()) {
@@ -41,7 +43,10 @@ class WilayahController extends Controller
                 ->withInput();
         }
 
-        Wilayah::create($request->all());
+        $data = $request->all();
+        $data['status_aktif'] = $request->has('status_aktif') ? true : false;
+        
+        Wilayah::create($data);
 
         return redirect()->route('wilayah.index')
             ->with('success', 'Wilayah berhasil ditambahkan!');
@@ -50,8 +55,9 @@ class WilayahController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Wilayah $wilayah)
+    public function show($id)
     {
+        $wilayah = Wilayah::where('ID_Wilayah', $id)->firstOrFail();
         $stuntings = $wilayah->stuntings()->orderBy('tahun', 'desc')->paginate(10);
         return view('wilayah.show', compact('wilayah', 'stuntings'));
     }
@@ -59,19 +65,24 @@ class WilayahController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Wilayah $wilayah)
+    public function edit($id)
     {
+        $wilayah = Wilayah::where('ID_Wilayah', $id)->firstOrFail();
         return view('wilayah.edit', compact('wilayah'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Wilayah $wilayah)
+    public function update(Request $request, $id)
     {
+        $wilayah = Wilayah::where('ID_Wilayah', $id)->firstOrFail();
+        
         $validator = Validator::make($request->all(), [
             'Provinsi' => 'required|string|max:100',
-            'Kabupaten' => 'required|string|max:100'
+            'Kabupaten' => 'required|string|max:100',
+            'nama_wilayah' => 'nullable|string|max:200',
+            'status_aktif' => 'boolean'
         ]);
 
         if ($validator->fails()) {
@@ -80,18 +91,22 @@ class WilayahController extends Controller
                 ->withInput();
         }
 
-        $wilayah->update($request->all());
+        $data = $request->all();
+        $data['status_aktif'] = $request->has('status_aktif') ? true : false;
+        
+        $wilayah->update($data);
 
         return redirect()->route('wilayah.index')
             ->with('success', 'Wilayah berhasil diperbarui!');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified resource in storage.
      */
-    public function destroy(Wilayah $wilayah)
+    public function destroy($id)
     {
         try {
+            $wilayah = Wilayah::where('ID_Wilayah', $id)->firstOrFail();
             $wilayah->delete();
             return redirect()->route('wilayah.index')
                 ->with('success', 'Wilayah berhasil dihapus!');

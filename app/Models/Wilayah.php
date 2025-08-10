@@ -35,4 +35,12 @@ class Wilayah extends Model
         }
         return $this->Provinsi . ' - ' . $this->Kabupaten;
     }
+
+    /**
+     * Get the ID for forms (compatibility with Laravel conventions)
+     */
+    public function getIdAttribute()
+    {
+        return $this->ID_Wilayah;
+    }
 }

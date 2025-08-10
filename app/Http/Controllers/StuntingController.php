@@ -80,16 +80,18 @@ class StuntingController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Stunting $stunting)
+    public function show($id)
     {
+        $stunting = Stunting::where('id_stunting', $id)->firstOrFail();
         return view('stunting.show', compact('stunting'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Stunting $stunting)
+    public function edit($id)
     {
+        $stunting = Stunting::where('id_stunting', $id)->firstOrFail();
         $wilayahs = Wilayah::orderBy('Kabupaten')->get();
         return view('stunting.edit', compact('stunting', 'wilayahs'));
     }
@@ -97,8 +99,10 @@ class StuntingController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Stunting $stunting)
+    public function update(Request $request, $id)
     {
+        $stunting = Stunting::where('id_stunting', $id)->firstOrFail();
+        
         $validator = Validator::make($request->all(), [
             'id_wilayah' => 'required|exists:wilayahs,ID_Wilayah',
             'tahun' => 'required|string|max:20',
@@ -132,8 +136,9 @@ class StuntingController extends Controller
     /**
      * Remove the specified resource in storage.
      */
-    public function destroy(Stunting $stunting)
+    public function destroy($id)
     {
+        $stunting = Stunting::where('id_stunting', $id)->firstOrFail();
         $stunting->delete();
         return redirect()->route('stunting.index')
             ->with('success', 'Data stunting berhasil dihapus!');

@@ -69,7 +69,7 @@
                                     <td>{{ $stunting->wilayah->Kabupaten }}</td>
                                     <td>{{ $stunting->tahun }}</td>
                                     <td>
-                                        <span class="badge bg-danger">{{ number_format($stunting->jumlah) }}</span>
+                                        <span class="badge bg-danger">{{ number_format($stunting->jumlah_stunting) }}</span>
                                     </td>
                                     <td>
                                         <div class="btn-group" role="group">

@@ -13,6 +13,10 @@ class FuzzyTimeSeriesService
     private $fuzzySets;
     private $fuzzyRelationships;
     private $predictions;
+    private $uod;
+    private $fuzzyLogicGroups;
+    private $fuzzyRelationshipsMatrix;
+    private $defuzzification;
 
     public function __construct()
     {
@@ -21,6 +25,10 @@ class FuzzyTimeSeriesService
         $this->fuzzySets = [];
         $this->fuzzyRelationships = [];
         $this->predictions = [];
+        $this->uod = [];
+        $this->fuzzyLogicGroups = [];
+        $this->fuzzyRelationshipsMatrix = [];
+        $this->defuzzification = [];
     }
 
     /**
@@ -31,7 +39,7 @@ class FuzzyTimeSeriesService
         $query = Stunting::with('wilayah')->orderBy('tahun')->orderBy('bulan');
 
         if ($wilayahId) {
-            $query->where('wilayah_id', $wilayahId);
+            $query->where('id_wilayah', $wilayahId);
         }
 
         if ($tahunAwal) {
@@ -43,13 +51,22 @@ class FuzzyTimeSeriesService
         }
 
         $this->data = $query->get();
+        
+        // Tambahkan field persentase jika belum ada
+        $this->data->each(function ($item) {
+            if (!isset($item->persentase)) {
+                // Hitung persentase berdasarkan jumlah stunting (contoh sederhana)
+                $item->persentase = $item->jumlah_stunting; // Untuk sementara gunakan jumlah sebagai persentase
+            }
+        });
+        
         return $this->data;
     }
 
     /**
-     * Tentukan interval untuk fuzzy sets
+     * Tentukan Universe of Discourse (UoD) - sesuai kode PHP native
      */
-    public function determineIntervals(): array
+    public function determineUoD(): array
     {
         if ($this->data->isEmpty()) {
             return [];
@@ -62,11 +79,11 @@ class FuzzyTimeSeriesService
         $range = $maxValue - $minValue;
         $intervalSize = $range / 7;
         
-        $this->intervals = [];
+        $this->uod = [];
         for ($i = 0; $i < 7; $i++) {
             $start = $minValue + ($i * $intervalSize);
             $end = $minValue + (($i + 1) * $intervalSize);
-            $this->intervals[] = [
+            $this->uod[] = [
                 'start' => round($start, 2),
                 'end' => round($end, 2),
                 'midpoint' => round(($start + $end) / 2, 2),
@@ -74,16 +91,16 @@ class FuzzyTimeSeriesService
             ];
         }
 
-        return $this->intervals;
+        return $this->uod;
     }
 
     /**
-     * Fuzzifikasi data
+     * Fuzzifikasi data - sesuai kode PHP native
      */
     public function fuzzify(): array
     {
-        if (empty($this->intervals)) {
-            $this->determineIntervals();
+        if (empty($this->uod)) {
+            $this->determineUoD();
         }
 
         $this->fuzzySets = [];
@@ -94,12 +111,14 @@ class FuzzyTimeSeriesService
             
             $this->fuzzySets[] = [
                 'id' => $item->id_stunting,
-                'wilayah' => $item->wilayah->nama_wilayah,
+                'wilayah' => $item->wilayah->nama_wilayah ?? ($item->wilayah->Provinsi . ' - ' . $item->wilayah->Kabupaten),
                 'tahun' => $item->tahun,
                 'bulan' => $item->bulan,
                 'nilai_asli' => $value,
                 'fuzzy_set' => $fuzzySet['label'],
-                'midpoint' => $fuzzySet['midpoint']
+                'midpoint' => $fuzzySet['midpoint'],
+                'interval_start' => $fuzzySet['start'],
+                'interval_end' => $fuzzySet['end']
             ];
         }
 
@@ -111,156 +130,206 @@ class FuzzyTimeSeriesService
      */
     private function findFuzzySet($value): array
     {
-        foreach ($this->intervals as $interval) {
+        foreach ($this->uod as $interval) {
             if ($value >= $interval['start'] && $value <= $interval['end']) {
                 return $interval;
             }
         }
         
         // Fallback ke interval terdekat
-        return $this->intervals[0];
+        return $this->uod[0];
     }
 
     /**
-     * Buat fuzzy relationships
+     * Buat fuzzy logic groups - sesuai kode PHP native
      */
-    public function createFuzzyRelationships(): array
+    public function createFuzzyLogicGroups(): array
     {
         if (empty($this->fuzzySets)) {
             $this->fuzzify();
         }
 
-        $this->fuzzyRelationships = [];
+        $this->fuzzyLogicGroups = [];
         
         for ($i = 0; $i < count($this->fuzzySets) - 1; $i++) {
             $current = $this->fuzzySets[$i]['fuzzy_set'];
             $next = $this->fuzzySets[$i + 1]['fuzzy_set'];
             
-            $this->fuzzyRelationships[] = [
-                'from' => $current,
-                'to' => $next,
-                'tahun' => $this->fuzzySets[$i]['tahun'],
-                'bulan' => $this->fuzzySets[$i]['bulan']
+            $this->fuzzyLogicGroups[] = [
+                'current' => $current,
+                'next' => $next,
+                'relationship' => $current . ' -> ' . $next
             ];
         }
 
-        return $this->fuzzyRelationships;
+        return $this->fuzzyLogicGroups;
     }
 
     /**
-     * Buat prediksi
+     * Buat fuzzy relationships matrix - sesuai kode PHP native
      */
-    public function makePredictions(): array
+    public function createFuzzyRelationshipsMatrix(): array
     {
-        if (empty($this->fuzzyRelationships)) {
-            $this->createFuzzyRelationships();
+        if (empty($this->fuzzyLogicGroups)) {
+            $this->createFuzzyLogicGroups();
         }
 
-        $this->predictions = [];
+        $this->fuzzyRelationshipsMatrix = [];
         
-        foreach ($this->fuzzyRelationships as $relationship) {
-            $predictedSet = $relationship['to'];
-            $predictedValue = $this->getMidpointByLabel($predictedSet);
+        // Hitung frekuensi setiap relationship
+        $relationships = collect($this->fuzzyLogicGroups)->groupBy('relationship');
+        
+        foreach ($relationships as $relationship => $group) {
+            $this->fuzzyRelationshipsMatrix[] = [
+                'relationship' => $relationship,
+                'frequency' => $group->count(),
+                'probability' => round($group->count() / count($this->fuzzyLogicGroups), 4)
+            ];
+        }
+
+        return $this->fuzzyRelationshipsMatrix;
+    }
+
+    /**
+     * Defuzzifikasi untuk prediksi - sesuai kode PHP native
+     */
+    public function defuzzify(): array
+    {
+        if (empty($this->fuzzyRelationshipsMatrix)) {
+            $this->createFuzzyRelationshipsMatrix();
+        }
+
+        $this->defuzzification = [];
+        
+        // Ambil fuzzy set terakhir dari data
+        $lastFuzzySet = end($this->fuzzySets);
+        $lastLabel = $lastFuzzySet['fuzzy_set'];
+        
+        // Cari relationship yang dimulai dengan fuzzy set terakhir
+        $nextRelationships = collect($this->fuzzyRelationshipsMatrix)
+            ->filter(function ($item) use ($lastLabel) {
+                return strpos($item['relationship'], $lastLabel . ' -> ') === 0;
+            })
+            ->sortByDesc('probability');
+        
+        if ($nextRelationships->isNotEmpty()) {
+            $mostProbable = $nextRelationships->first();
+            $nextFuzzySet = explode(' -> ', $mostProbable['relationship'])[1];
             
-            $this->predictions[] = [
-                'tahun' => $relationship['tahun'],
-                'bulan' => $relationship['bulan'],
-                'fuzzy_set_aktual' => $relationship['from'],
-                'fuzzy_set_prediksi' => $predictedSet,
-                'nilai_prediksi' => $predictedValue,
-                'akurasi' => $this->calculateAccuracy($relationship['from'], $predictedSet)
+            // Cari midpoint dari fuzzy set berikutnya
+            $nextInterval = collect($this->uod)->firstWhere('label', $nextFuzzySet);
+            
+            $this->defuzzification = [
+                'last_fuzzy_set' => $lastLabel,
+                'predicted_fuzzy_set' => $nextFuzzySet,
+                'predicted_value' => $nextInterval['midpoint'],
+                'confidence' => $mostProbable['probability'],
+                'relationship_used' => $mostProbable['relationship']
             ];
         }
 
-        return $this->predictions;
+        return $this->defuzzification;
     }
 
     /**
-     * Dapatkan midpoint berdasarkan label fuzzy set
+     * Prediksi nilai berikutnya berdasarkan fuzzy set
      */
-    private function getMidpointByLabel($label): float
+    private function predictNextValue($fuzzySet): float
     {
-        foreach ($this->intervals as $interval) {
-            if ($interval['label'] === $label) {
-                return $interval['midpoint'];
-            }
-        }
-        return 0;
+        $interval = collect($this->uod)->firstWhere('label', $fuzzySet);
+        return $interval ? $interval['midpoint'] : 0;
     }
 
     /**
-     * Hitung akurasi prediksi
+     * Hitung persentase error
      */
-    private function calculateAccuracy($actual, $predicted): float
+    private function calculateErrorPercentage($actual, $predicted): float
     {
-        if ($actual === $predicted) {
-            return 100.0;
-        }
-        
-        // Hitung jarak antar fuzzy set
-        $actualIndex = $this->getFuzzySetIndex($actual);
-        $predictedIndex = $this->getFuzzySetIndex($predicted);
-        
-        $distance = abs($actualIndex - $predictedIndex);
-        $maxDistance = count($this->intervals) - 1;
-        
-        return max(0, 100 - (($distance / $maxDistance) * 100));
+        if ($actual == 0) return 0;
+        return abs(($actual - $predicted) / $actual) * 100;
     }
 
     /**
-     * Dapatkan index fuzzy set
-     */
-    private function getFuzzySetIndex($label): int
-    {
-        foreach ($this->intervals as $index => $interval) {
-            if ($interval['label'] === $label) {
-                return $index;
-            }
-        }
-        return 0;
-    }
-
-    /**
-     * Jalankan seluruh proses FTS
+     * Jalankan seluruh proses Fuzzy Time Series
      */
     public function runFuzzyTimeSeries($wilayahId = null, $tahunAwal = null, $tahunAkhir = null): array
     {
+        // Ambil data
         $this->getStuntingData($wilayahId, $tahunAwal, $tahunAkhir);
-        $this->determineIntervals();
-        $this->fuzzify();
-        $this->createFuzzyRelationships();
-        $this->makePredictions();
+        
+        if ($this->data->isEmpty()) {
+            return [];
+        }
+
+        // Jalankan semua langkah FTS
+        $uod = $this->determineUoD();
+        $fuzzySets = $this->fuzzify();
+        $fuzzyLogicGroups = $this->createFuzzyLogicGroups();
+        $fuzzyRelationshipsMatrix = $this->createFuzzyRelationshipsMatrix();
+        $defuzzification = $this->defuzzify();
+
+        // Buat summary
+        $summary = $this->getSummary();
 
         return [
-            'data_mentah' => $this->data,
-            'intervals' => $this->intervals,
-            'fuzzy_sets' => $this->fuzzySets,
-            'fuzzy_relationships' => $this->fuzzyRelationships,
-            'predictions' => $this->predictions,
-            'summary' => $this->getSummary()
+            'data' => $this->data,
+            'uod' => $uod,
+            'fuzzy_sets' => $fuzzySets,
+            'fuzzy_logic_groups' => $fuzzyLogicGroups,
+            'fuzzy_relationships_matrix' => $fuzzyRelationshipsMatrix,
+            'defuzzification' => $defuzzification,
+            'summary' => $summary
         ];
     }
 
     /**
-     * Dapatkan ringkasan hasil
+     * Buat summary hasil perhitungan
      */
     private function getSummary(): array
     {
-        if (empty($this->predictions)) {
-            return [];
-        }
-
-        $totalPredictions = count($this->predictions);
-        $accuratePredictions = collect($this->predictions)->where('akurasi', 100)->count();
-        $averageAccuracy = collect($this->predictions)->avg('akurasi');
-        $averagePrediction = collect($this->predictions)->avg('nilai_prediksi');
+        $totalData = $this->data->count();
+        $totalWilayah = $this->data->unique('id_wilayah')->count();
+        $tahunRange = $this->data->pluck('tahun')->unique()->sort();
+        
+        $minValue = $this->data->min('jumlah_stunting');
+        $maxValue = $this->data->max('jumlah_stunting');
+        $avgValue = $this->data->avg('jumlah_stunting');
+        
+        $prediction = $this->defuzzification['predicted_value'] ?? 0;
+        $confidence = $this->defuzzification['confidence'] ?? 0;
 
         return [
-            'total_prediksi' => $totalPredictions,
-            'prediksi_akurat' => $accuratePredictions,
-            'akurasi_rata_rata' => round($averageAccuracy, 2),
-            'prediksi_rata_rata' => round($averagePrediction, 2),
-            'tingkat_keberhasilan' => round(($accuratePredictions / $totalPredictions) * 100, 2)
+            'total_data' => $totalData,
+            'total_wilayah' => $totalWilayah,
+            'tahun_range' => $tahunRange->values()->toArray(),
+            'min_value' => $minValue,
+            'max_value' => $maxValue,
+            'avg_value' => round($avgValue, 2),
+            'prediction' => round($prediction, 2),
+            'confidence' => round($confidence * 100, 2),
+            'algorithm' => 'Fuzzy Time Series (FTS)',
+            'intervals_count' => count($this->uod)
+        ];
+    }
+
+    /**
+     * Dapatkan statistik wilayah
+     */
+    public function getWilayahStats($wilayahId = null): array
+    {
+        $query = Stunting::with('wilayah');
+        
+        if ($wilayahId) {
+            $query->where('id_wilayah', $wilayahId);
+        }
+        
+        $data = $query->get();
+        
+        return [
+            'total_records' => $data->count(),
+            'wilayahs' => $data->unique('id_wilayah')->count(),
+            'tahun_range' => $data->pluck('tahun')->unique()->sort()->values()->toArray(),
+            'avg_stunting' => round($data->avg('jumlah_stunting'), 2)
         ];
     }
 }
