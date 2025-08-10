@@ -1,24 +1,20 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Fuzzy Time Series</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+@extends('welcome')
+
+@section('title', 'Login - FTS')
+@section('description', 'Login untuk mengakses sistem')
+
+@section('content')
     <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div class="max-w-md w-full space-y-8">
             <div class="text-center">
-                <div class="mx-auto h-16 w-16 bg-indigo-600 rounded-full flex items-center justify-center">
-                    <i class="fas fa-brain text-white text-2xl"></i>
-                </div>
+            <div class="w-20 h-20 bg-white/90 rounded-2xl shadow-lg flex items-center justify-center border-2 border-green-200 mx-auto">
+                <img src="{{ asset('images/logo.png') }}" alt="Logo" class="w-full h-full object-contain rounded-2xl">
+            </div>
                 <h2 class="mt-6 text-3xl font-extrabold text-gray-900">
-                    Welcome Back
+                Selamat Datang
                 </h2>
                 <p class="mt-2 text-sm text-gray-600">
-                    Sign in to your Fuzzy System account
+                Silakan masuk untuk mengakses sistem
                 </p>
             </div>
             
@@ -52,7 +48,7 @@
                 <div class="flex items-center justify-between">
                     <div class="text-sm">
                         <a href="{{ route('register') }}" class="font-medium text-indigo-600 hover:text-indigo-500">
-                            Don't have an account?
+                            Belum punya akun?
                         </a>
                     </div>
                 </div>
@@ -63,7 +59,7 @@
                         <span class="absolute left-0 inset-y-0 flex items-center pl-3">
                             <i class="fas fa-sign-in-alt text-indigo-500 group-hover:text-indigo-400"></i>
                         </span>
-                        Sign in
+                        Masuk
                     </button>
                 </div>
             </form>
@@ -71,10 +67,9 @@
             <div class="text-center">
                 <a href="/" class="text-sm text-gray-600 hover:text-gray-900">
                     <i class="fas fa-arrow-left mr-1"></i>
-                    Back to Home
+                    Kembali ke Beranda
                 </a>
             </div>
         </div>
     </div>
-</body>
-</html>
+@endsection

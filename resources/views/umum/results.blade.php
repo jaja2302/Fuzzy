@@ -1,9 +1,9 @@
 @extends('welcome')
 
-@section('title', 'Data Wilayah - FTS')
-@section('description', 'Data wilayah BKKBN SUMUT')
+@section('title', 'Perkiraan Stunting - FTS')
+@section('description', 'Perkiraan Stunting di BKKBN SUMUT')
 
-@section('content')y
+@section('content')
     <div class="header">
         <div class="container">
             <h1><i class="fas fa-chart-line mr-3"></i>Fuzzy Time Series Analysis</h1>

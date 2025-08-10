@@ -334,12 +334,8 @@
                 <div class="flex items-center justify-center mb-10">
                     <div class="logo-container">
                         <div class="logo-inner">
-                            <i class="fas fa-chart-line text-3xl bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"></i>
+                        <img src="{{ asset('images/logo.png') }}" alt="Logo" class="w-10 h-10 object-contain rounded-2xl">
                         </div>
-                    </div>
-                    <div class="ml-5 logo-text">
-                        <h1>Fuzzy FTS</h1>
-                        <p>Analytics Platform</p>
                     </div>
                 </div>
                 
