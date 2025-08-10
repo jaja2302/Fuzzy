@@ -17,8 +17,8 @@ class StuntingController extends Controller
         $query = Stunting::with('wilayah');
         
         // Filter by wilayah
-        if ($request->filled('wilayah_id')) {
-            $query->where('wilayah_id', $request->wilayah_id);
+        if ($request->filled('id_wilayah')) {
+            $query->where('id_wilayah', $request->id_wilayah);
         }
         
         // Filter by tahun
@@ -27,10 +27,9 @@ class StuntingController extends Controller
         }
         
         $stuntings = $query->orderBy('tahun', 'desc')
-                           ->orderBy('bulan', 'desc')
                            ->paginate(15);
         
-        $wilayahs = Wilayah::orderBy('nama_wilayah')->get();
+        $wilayahs = Wilayah::orderBy('Kabupaten')->get();
         
         return view('stunting.index', compact('stuntings', 'wilayahs'));
     }
@@ -40,7 +39,7 @@ class StuntingController extends Controller
      */
     public function create()
     {
-        $wilayahs = Wilayah::where('status_aktif', true)->orderBy('nama_wilayah')->get();
+        $wilayahs = Wilayah::orderBy('Kabupaten')->get();
         return view('stunting.create', compact('wilayahs'));
     }
 
@@ -50,10 +49,9 @@ class StuntingController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'wilayah_id' => 'required|exists:wilayahs,id',
-            'tahun' => 'required|integer|min:2000|max:2030',
-            'bulan' => 'nullable|integer|min:1|max:12',
-            'jumlah_stunting' => 'required|integer|min:0'
+            'id_wilayah' => 'required|exists:wilayahs,ID_Wilayah',
+            'tahun' => 'required|string|max:20',
+            'jumlah' => 'required|string|max:20'
         ]);
 
         if ($validator->fails()) {
@@ -63,14 +61,13 @@ class StuntingController extends Controller
         }
 
         // Check for duplicate data
-        $existing = Stunting::where('wilayah_id', $request->wilayah_id)
+        $existing = Stunting::where('id_wilayah', $request->id_wilayah)
                            ->where('tahun', $request->tahun)
-                           ->where('bulan', $request->bulan)
                            ->first();
         
         if ($existing) {
             return redirect()->back()
-                ->withErrors(['bulan' => 'Data untuk wilayah, tahun, dan bulan ini sudah ada.'])
+                ->withErrors(['tahun' => 'Data untuk wilayah dan tahun ini sudah ada.'])
                 ->withInput();
         }
 
@@ -93,7 +90,7 @@ class StuntingController extends Controller
      */
     public function edit(Stunting $stunting)
     {
-        $wilayahs = Wilayah::where('status_aktif', true)->orderBy('nama_wilayah')->get();
+        $wilayahs = Wilayah::orderBy('Kabupaten')->get();
         return view('stunting.edit', compact('stunting', 'wilayahs'));
     }
 
@@ -103,10 +100,9 @@ class StuntingController extends Controller
     public function update(Request $request, Stunting $stunting)
     {
         $validator = Validator::make($request->all(), [
-            'wilayah_id' => 'required|exists:wilayahs,id',
-            'tahun' => 'required|integer|min:2000|max:2030',
-            'bulan' => 'nullable|integer|min:1|max:12',
-            'jumlah_stunting' => 'required|integer|min:0'
+            'id_wilayah' => 'required|exists:wilayahs,ID_Wilayah',
+            'tahun' => 'required|string|max:20',
+            'jumlah' => 'required|string|max:20'
         ]);
 
         if ($validator->fails()) {
@@ -116,15 +112,14 @@ class StuntingController extends Controller
         }
 
         // Check for duplicate data (excluding current record)
-        $existing = Stunting::where('wilayah_id', $request->wilayah_id)
+        $existing = Stunting::where('id_wilayah', $request->id_wilayah)
                            ->where('tahun', $request->tahun)
-                           ->where('bulan', $request->bulan)
-                           ->where('id', '!=', $stunting->id)
+                           ->where('id_stunting', '!=', $stunting->id_stunting)
                            ->first();
         
         if ($existing) {
             return redirect()->back()
-                ->withErrors(['bulan' => 'Data untuk wilayah, tahun, dan bulan ini sudah ada.'])
+                ->withErrors(['tahun' => 'Data untuk wilayah dan tahun ini sudah ada.'])
                 ->withInput();
         }
 
@@ -135,7 +130,7 @@ class StuntingController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified resource in storage.
      */
     public function destroy(Stunting $stunting)
     {

@@ -7,28 +7,32 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Wilayah extends Model
 {
+    protected $primaryKey = 'ID_Wilayah';
+    
     protected $fillable = [
+        'Provinsi',
+        'Kabupaten',
         'nama_wilayah',
-        'kode_wilayah',
-        'deskripsi',
-        'provinsi',
-        'kabupaten',
-        'kecamatan',
-        'desa',
-        'jumlah_penduduk',
-        'luas_wilayah',
-        'satuan_luas',
         'status_aktif'
     ];
 
     protected $casts = [
-        'jumlah_penduduk' => 'integer',
-        'luas_wilayah' => 'decimal:2',
         'status_aktif' => 'boolean'
     ];
 
     public function stuntings(): HasMany
     {
-        return $this->hasMany(Stunting::class);
+        return $this->hasMany(Stunting::class, 'id_wilayah', 'ID_Wilayah');
+    }
+
+    /**
+     * Get the full wilayah name (Provinsi - Kabupaten)
+     */
+    public function getNamaWilayahAttribute($value)
+    {
+        if ($value) {
+            return $value;
+        }
+        return $this->Provinsi . ' - ' . $this->Kabupaten;
     }
 }

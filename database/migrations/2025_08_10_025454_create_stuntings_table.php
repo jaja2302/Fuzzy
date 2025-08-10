@@ -12,14 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('stuntings', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('wilayah_id')->constrained('wilayahs')->onDelete('cascade');
+            $table->id('id_stunting');
+            $table->unsignedBigInteger('id_wilayah');
             $table->integer('tahun');
-            $table->integer('bulan')->nullable();
+            $table->integer('bulan');
             $table->integer('jumlah_stunting');
             $table->timestamps();
             
-            $table->unique(['wilayah_id', 'tahun', 'bulan']);
+            $table->foreign('id_wilayah')->references('ID_Wilayah')->on('wilayahs')->onDelete('cascade');
         });
     }
 

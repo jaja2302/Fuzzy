@@ -12,17 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('wilayahs', function (Blueprint $table) {
-            $table->id();
+            $table->id('ID_Wilayah');
+            $table->string('Provinsi');
+            $table->string('Kabupaten');
             $table->string('nama_wilayah');
-            $table->string('kode_wilayah')->unique();
-            $table->text('deskripsi')->nullable();
-            $table->string('provinsi')->nullable();
-            $table->string('kabupaten')->nullable();
-            $table->string('kecamatan')->nullable();
-            $table->string('desa')->nullable();
-            $table->integer('jumlah_penduduk')->default(0);
-            $table->decimal('luas_wilayah', 10, 2)->nullable();
-            $table->string('satuan_luas')->default('km2');
             $table->boolean('status_aktif')->default(true);
             $table->timestamps();
         });

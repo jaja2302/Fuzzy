@@ -15,12 +15,12 @@
                     <!-- Filter Section -->
                     <div class="row mb-3">
                         <div class="col-md-3">
-                            <label for="wilayah_id" class="form-label">Wilayah</label>
-                            <select class="form-select" id="wilayah_id" name="wilayah_id">
+                            <label for="id_wilayah" class="form-label">Wilayah</label>
+                            <select class="form-select" id="id_wilayah" name="id_wilayah">
                                 <option value="">Semua Wilayah</option>
                                 @foreach($wilayahs as $wilayah)
-                                    <option value="{{ $wilayah->id }}" {{ request('wilayah_id') == $wilayah->id ? 'selected' : '' }}>
-                                        {{ $wilayah->nama_wilayah }}
+                                    <option value="{{ $wilayah->ID_Wilayah }}" {{ request('id_wilayah') == $wilayah->ID_Wilayah ? 'selected' : '' }}>
+                                        {{ $wilayah->Kabupaten }}
                                     </option>
                                 @endforeach
                             </select>
@@ -58,7 +58,6 @@
                                     <th>No</th>
                                     <th>Wilayah</th>
                                     <th>Tahun</th>
-                                    <th>Bulan</th>
                                     <th>Jumlah Stunting</th>
                                     <th>Aksi</th>
                                 </tr>
@@ -67,29 +66,22 @@
                                 @forelse($stuntings as $index => $stunting)
                                 <tr>
                                     <td>{{ $stuntings->firstItem() + $index }}</td>
-                                    <td>{{ $stunting->wilayah->nama_wilayah }}</td>
+                                    <td>{{ $stunting->wilayah->Kabupaten }}</td>
                                     <td>{{ $stunting->tahun }}</td>
                                     <td>
-                                        @if($stunting->bulan)
-                                            {{ date('F', mktime(0, 0, 0, $stunting->bulan, 1)) }}
-                                        @else
-                                            <span class="text-muted">-</span>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-danger">{{ number_format($stunting->jumlah_stunting) }}</span>
+                                        <span class="badge bg-danger">{{ number_format($stunting->jumlah) }}</span>
                                     </td>
                                     <td>
                                         <div class="btn-group" role="group">
-                                            <a href="{{ route('stunting.show', $stunting->id) }}" 
+                                            <a href="{{ route('stunting.show', $stunting->id_stunting) }}" 
                                                class="btn btn-sm btn-info" title="Lihat">
                                                 <i class="fas fa-eye"></i>
                                             </a>
-                                            <a href="{{ route('stunting.edit', $stunting->id) }}" 
+                                            <a href="{{ route('stunting.edit', $stunting->id_stunting) }}" 
                                                class="btn btn-sm btn-warning" title="Edit">
                                                 <i class="fas fa-edit"></i>
                                             </a>
-                                            <form action="{{ route('stunting.destroy', $stunting->id) }}" 
+                                            <form action="{{ route('stunting.destroy', $stunting->id_stunting) }}" 
                                                   method="POST" class="d-inline" 
                                                   onsubmit="return confirm('Yakin ingin menghapus data ini?')">
                                                 @csrf
@@ -103,7 +95,7 @@
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="6" class="text-center text-muted">
+                                    <td colspan="5" class="text-center text-muted">
                                         <i class="fas fa-inbox fa-2x mb-2"></i>
                                         <p>Tidak ada data stunting yang ditemukan.</p>
                                     </td>
@@ -125,13 +117,13 @@
 
 <script>
 function applyFilter() {
-    const wilayahId = document.getElementById('wilayah_id').value;
+    const wilayahId = document.getElementById('id_wilayah').value;
     const tahun = document.getElementById('tahun').value;
     
     let url = '{{ route("stunting.index") }}?';
     const params = new URLSearchParams();
     
-    if (wilayahId) params.append('wilayah_id', wilayahId);
+    if (wilayahId) params.append('id_wilayah', wilayahId);
     if (tahun) params.append('tahun', tahun);
     
     window.location.href = url + params.toString();

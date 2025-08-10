@@ -20,10 +20,6 @@
             background-color: #f8f9fa;
             border-top: none;
         }
-        .status-badge {
-            font-size: 0.75rem;
-            padding: 0.25rem 0.5rem;
-        }
     </style>
 </head>
 <body class="bg-light">
@@ -61,14 +57,9 @@
                                 <thead>
                                     <tr>
                                         <th>No</th>
-                                        <th>Kode</th>
-                                        <th>Nama Wilayah</th>
+                                        <th>ID Wilayah</th>
                                         <th>Provinsi</th>
                                         <th>Kabupaten</th>
-                                        <th>Kecamatan</th>
-                                        <th>Jumlah Penduduk</th>
-                                        <th>Luas</th>
-                                        <th>Status</th>
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>
@@ -77,37 +68,11 @@
                                         <tr>
                                             <td>{{ $index + 1 + ($wilayahs->currentPage() - 1) * $wilayahs->perPage() }}</td>
                                             <td>
-                                                <span class="badge bg-secondary">{{ $wilayah->kode_wilayah }}</span>
+                                                <span class="badge bg-secondary">{{ $wilayah->ID_Wilayah }}</span>
                                             </td>
+                                            <td>{{ $wilayah->Provinsi }}</td>
                                             <td>
-                                                <strong>{{ $wilayah->nama_wilayah }}</strong>
-                                                @if($wilayah->deskripsi)
-                                                    <br><small class="text-muted">{{ Str::limit($wilayah->deskripsi, 50) }}</small>
-                                                @endif
-                                            </td>
-                                            <td>{{ $wilayah->provinsi ?? '-' }}</td>
-                                            <td>{{ $wilayah->kabupaten ?? '-' }}</td>
-                                            <td>{{ $wilayah->kecamatan ?? '-' }}</td>
-                                            <td>
-                                                @if($wilayah->jumlah_penduduk)
-                                                    {{ number_format($wilayah->jumlah_penduduk) }}
-                                                @else
-                                                    -
-                                                @endif
-                                            </td>
-                                            <td>
-                                                @if($wilayah->luas_wilayah)
-                                                    {{ $wilayah->luas_wilayah }} {{ $wilayah->satuan_luas }}
-                                                @else
-                                                    -
-                                                @endif
-                                            </td>
-                                            <td>
-                                                @if($wilayah->status_aktif)
-                                                    <span class="badge bg-success status-badge">Aktif</span>
-                                                @else
-                                                    <span class="badge bg-danger status-badge">Tidak Aktif</span>
-                                                @endif
+                                                <strong>{{ $wilayah->Kabupaten }}</strong>
                                             </td>
                                             <td>
                                                 <div class="btn-group" role="group">
@@ -138,7 +103,7 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="10" class="text-center py-4">
+                                            <td colspan="5" class="text-center py-4">
                                                 <div class="text-muted">
                                                     <i class="fas fa-inbox fa-3x mb-3"></i>
                                                     <p>Tidak ada data wilayah</p>

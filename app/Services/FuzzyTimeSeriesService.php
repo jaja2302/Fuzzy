@@ -93,7 +93,7 @@ class FuzzyTimeSeriesService
             $fuzzySet = $this->findFuzzySet($value);
             
             $this->fuzzySets[] = [
-                'id' => $item->id,
+                'id' => $item->id_stunting,
                 'wilayah' => $item->wilayah->nama_wilayah,
                 'tahun' => $item->tahun,
                 'bulan' => $item->bulan,

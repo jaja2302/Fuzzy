@@ -26,7 +26,9 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 // Route for Fuzzy Time Series (publicly accessible)
 Route::get('/fuzzy-time-series', [FuzzyTimeSeriesController::class, 'index'])->name('fuzzy-time-series.index');
 Route::post('/fuzzy-time-series', [FuzzyTimeSeriesController::class, 'store'])->name('fuzzy-time-series.store');
+Route::post('/fuzzy-time-series/calculate', [FuzzyTimeSeriesController::class, 'calculate'])->name('fuzzy-time-series.calculate');
 Route::get('/fuzzy-time-series/result', [FuzzyTimeSeriesController::class, 'result'])->name('fuzzy-time-series.result');
+Route::get('/fuzzy-time-series/data', [FuzzyTimeSeriesController::class, 'data'])->name('fuzzy-time-series.data');
 
 // Protected routes (require authentication)
 Route::middleware(['auth'])->group(function () {

@@ -21,150 +21,78 @@ class StuntingSeeder extends Seeder
             return;
         }
 
-        $dataStunting = [];
-        
-        // Data untuk setiap wilayah dari tahun 2020-2024
-        foreach ($wilayahs as $wilayah) {
-            // Data tahun 2020
-            $dataStunting[] = [
-                'wilayah_id' => $wilayah->id,
-                'tahun' => 2020,
-                'bulan' => 1,
-                'jumlah_balita' => rand(800, 1200),
-                'jumlah_stunting' => rand(120, 300),
-                'persentase_stunting' => rand(15.0, 25.0),
-                'tinggi_badan_ratarata' => rand(85, 95),
-                'berat_badan_ratarata' => rand(10, 15),
-                'kategori_stunting' => 'Sedang',
-                'catatan' => 'Data awal tahun 2020',
-                'sumber_data' => 'Dinas Kesehatan',
-                'status_validasi' => true
-            ];
+        // Data stunting sesuai dengan database lama
+        $dataStunting = [
+            // Tahun 2023 - Januari
+            ['id_wilayah' => 1, 'tahun' => 2023, 'bulan' => 1, 'jumlah_stunting' => 25686],
+            ['id_wilayah' => 2, 'tahun' => 2023, 'bulan' => 1, 'jumlah_stunting' => 17331],
+            ['id_wilayah' => 3, 'tahun' => 2023, 'bulan' => 1, 'jumlah_stunting' => 23610],
+            ['id_wilayah' => 4, 'tahun' => 2023, 'bulan' => 1, 'jumlah_stunting' => 14376],
+            ['id_wilayah' => 5, 'tahun' => 2023, 'bulan' => 1, 'jumlah_stunting' => 37908],
+            ['id_wilayah' => 6, 'tahun' => 2023, 'bulan' => 1, 'jumlah_stunting' => 22467],
+            ['id_wilayah' => 7, 'tahun' => 2023, 'bulan' => 1, 'jumlah_stunting' => 69296],
+            ['id_wilayah' => 8, 'tahun' => 2023, 'bulan' => 1, 'jumlah_stunting' => 37407],
+            ['id_wilayah' => 9, 'tahun' => 2023, 'bulan' => 1, 'jumlah_stunting' => 28746],
+            ['id_wilayah' => 10, 'tahun' => 2023, 'bulan' => 1, 'jumlah_stunting' => 27240],
+            ['id_wilayah' => 11, 'tahun' => 2023, 'bulan' => 1, 'jumlah_stunting' => 17570],
+            ['id_wilayah' => 12, 'tahun' => 2023, 'bulan' => 1, 'jumlah_stunting' => 9814],
+            ['id_wilayah' => 13, 'tahun' => 2023, 'bulan' => 1, 'jumlah_stunting' => 37654],
+            ['id_wilayah' => 14, 'tahun' => 2023, 'bulan' => 1, 'jumlah_stunting' => 29915],
+            ['id_wilayah' => 15, 'tahun' => 2023, 'bulan' => 1, 'jumlah_stunting' => 3516],
+            ['id_wilayah' => 16, 'tahun' => 2023, 'bulan' => 1, 'jumlah_stunting' => 10456],
+            ['id_wilayah' => 17, 'tahun' => 2023, 'bulan' => 1, 'jumlah_stunting' => 8832],
+            ['id_wilayah' => 18, 'tahun' => 2023, 'bulan' => 1, 'jumlah_stunting' => 24003],
+            ['id_wilayah' => 19, 'tahun' => 2023, 'bulan' => 1, 'jumlah_stunting' => 19061],
+            ['id_wilayah' => 20, 'tahun' => 2023, 'bulan' => 1, 'jumlah_stunting' => 14099],
+            ['id_wilayah' => 21, 'tahun' => 2023, 'bulan' => 1, 'jumlah_stunting' => 20124],
+            ['id_wilayah' => 22, 'tahun' => 2023, 'bulan' => 1, 'jumlah_stunting' => 16129],
+            ['id_wilayah' => 23, 'tahun' => 2023, 'bulan' => 1, 'jumlah_stunting' => 19805],
+            ['id_wilayah' => 24, 'tahun' => 2023, 'bulan' => 1, 'jumlah_stunting' => 13338],
+            ['id_wilayah' => 25, 'tahun' => 2023, 'bulan' => 1, 'jumlah_stunting' => 8592],
+            ['id_wilayah' => 26, 'tahun' => 2023, 'bulan' => 1, 'jumlah_stunting' => 63450],
+            ['id_wilayah' => 27, 'tahun' => 2023, 'bulan' => 1, 'jumlah_stunting' => 8641],
+            ['id_wilayah' => 28, 'tahun' => 2023, 'bulan' => 1, 'jumlah_stunting' => 7118],
+            ['id_wilayah' => 29, 'tahun' => 2023, 'bulan' => 1, 'jumlah_stunting' => 5574],
+            ['id_wilayah' => 30, 'tahun' => 2023, 'bulan' => 1, 'jumlah_stunting' => 6108],
+            ['id_wilayah' => 31, 'tahun' => 2023, 'bulan' => 1, 'jumlah_stunting' => 5329],
+            ['id_wilayah' => 32, 'tahun' => 2023, 'bulan' => 1, 'jumlah_stunting' => 12076],
+            ['id_wilayah' => 33, 'tahun' => 2023, 'bulan' => 1, 'jumlah_stunting' => 10140],
             
-            $dataStunting[] = [
-                'wilayah_id' => $wilayah->id,
-                'tahun' => 2020,
-                'bulan' => 6,
-                'jumlah_balita' => rand(800, 1200),
-                'jumlah_stunting' => rand(100, 280),
-                'persentase_stunting' => rand(12.5, 23.5),
-                'tinggi_badan_ratarata' => rand(86, 96),
-                'berat_badan_ratarata' => rand(10.5, 15.5),
-                'kategori_stunting' => 'Sedang',
-                'catatan' => 'Data pertengahan tahun 2020',
-                'sumber_data' => 'Dinas Kesehatan',
-                'status_validasi' => true
-            ];
-            
-            // Data tahun 2021
-            $dataStunting[] = [
-                'wilayah_id' => $wilayah->id,
-                'tahun' => 2021,
-                'bulan' => 1,
-                'jumlah_balita' => rand(800, 1200),
-                'jumlah_stunting' => rand(95, 275),
-                'persentase_stunting' => rand(11.9, 23.0),
-                'tinggi_badan_ratarata' => rand(87, 97),
-                'berat_badan_ratarata' => rand(11, 16),
-                'kategori_stunting' => 'Sedang',
-                'catatan' => 'Data awal tahun 2021',
-                'sumber_data' => 'Dinas Kesehatan',
-                'status_validasi' => true
-            ];
-            
-            $dataStunting[] = [
-                'wilayah_id' => $wilayah->id,
-                'tahun' => 2021,
-                'bulan' => 6,
-                'jumlah_balita' => rand(800, 1200),
-                'jumlah_stunting' => rand(90, 270),
-                'persentase_stunting' => rand(11.3, 22.5),
-                'tinggi_badan_ratarata' => rand(88, 98),
-                'berat_badan_ratarata' => rand(11.5, 16.5),
-                'kategori_stunting' => 'Sedang',
-                'catatan' => 'Data pertengahan tahun 2021',
-                'sumber_data' => 'Dinas Kesehatan',
-                'status_validasi' => true
-            ];
-            
-            // Data tahun 2022
-            $dataStunting[] = [
-                'wilayah_id' => $wilayah->id,
-                'tahun' => 2022,
-                'bulan' => 1,
-                'jumlah_balita' => rand(800, 1200),
-                'jumlah_stunting' => rand(85, 265),
-                'persentase_stunting' => rand(10.6, 22.1),
-                'tinggi_badan_ratarata' => rand(89, 99),
-                'berat_badan_ratarata' => rand(12, 17),
-                'kategori_stunting' => 'Sedang',
-                'catatan' => 'Data awal tahun 2022',
-                'sumber_data' => 'Dinas Kesehatan',
-                'status_validasi' => true
-            ];
-            
-            $dataStunting[] = [
-                'wilayah_id' => $wilayah->id,
-                'tahun' => 2022,
-                'bulan' => 6,
-                'jumlah_balita' => rand(800, 1200),
-                'jumlah_stunting' => rand(80, 260),
-                'persentase_stunting' => rand(10.0, 21.7),
-                'tinggi_badan_ratarata' => rand(90, 100),
-                'berat_badan_ratarata' => rand(12.5, 17.5),
-                'kategori_stunting' => 'Sedang',
-                'catatan' => 'Data pertengahan tahun 2022',
-                'sumber_data' => 'Dinas Kesehatan',
-                'status_validasi' => true
-            ];
-            
-            // Data tahun 2023
-            $dataStunting[] = [
-                'wilayah_id' => $wilayah->id,
-                'tahun' => 2023,
-                'bulan' => 1,
-                'jumlah_balita' => rand(800, 1200),
-                'jumlah_stunting' => rand(75, 255),
-                'persentase_stunting' => rand(9.4, 21.2),
-                'tinggi_badan_ratarata' => rand(91, 101),
-                'berat_badan_ratarata' => rand(13, 18),
-                'kategori_stunting' => 'Sedang',
-                'catatan' => 'Data awal tahun 2023',
-                'sumber_data' => 'Dinas Kesehatan',
-                'status_validasi' => true
-            ];
-            
-            $dataStunting[] = [
-                'wilayah_id' => $wilayah->id,
-                'tahun' => 2023,
-                'bulan' => 6,
-                'jumlah_balita' => rand(800, 1200),
-                'jumlah_stunting' => rand(70, 250),
-                'persentase_stunting' => rand(8.8, 20.8),
-                'tinggi_badan_ratarata' => rand(92, 102),
-                'berat_badan_ratarata' => rand(13.5, 18.5),
-                'kategori_stunting' => 'Sedang',
-                'catatan' => 'Data pertengahan tahun 2023',
-                'sumber_data' => 'Dinas Kesehatan',
-                'status_validasi' => true
-            ];
-            
-            // Data tahun 2024
-            $dataStunting[] = [
-                'wilayah_id' => $wilayah->id,
-                'tahun' => 2024,
-                'bulan' => 1,
-                'jumlah_balita' => rand(800, 1200),
-                'jumlah_stunting' => rand(65, 245),
-                'persentase_stunting' => rand(8.1, 20.4),
-                'tinggi_badan_ratarata' => rand(93, 103),
-                'berat_badan_ratarata' => rand(14, 19),
-                'kategori_stunting' => 'Sedang',
-                'catatan' => 'Data awal tahun 2024',
-                'sumber_data' => 'Dinas Kesehatan',
-                'status_validasi' => true
-            ];
-        }
+            // Tahun 2024 - Januari
+            ['id_wilayah' => 1, 'tahun' => 2024, 'bulan' => 1, 'jumlah_stunting' => 21526],
+            ['id_wilayah' => 2, 'tahun' => 2024, 'bulan' => 1, 'jumlah_stunting' => 13496],
+            ['id_wilayah' => 3, 'tahun' => 2024, 'bulan' => 1, 'jumlah_stunting' => 11075],
+            ['id_wilayah' => 4, 'tahun' => 2024, 'bulan' => 1, 'jumlah_stunting' => 14190],
+            ['id_wilayah' => 5, 'tahun' => 2024, 'bulan' => 1, 'jumlah_stunting' => 28899],
+            ['id_wilayah' => 6, 'tahun' => 2024, 'bulan' => 1, 'jumlah_stunting' => 18244],
+            ['id_wilayah' => 7, 'tahun' => 2024, 'bulan' => 1, 'jumlah_stunting' => 42042],
+            ['id_wilayah' => 8, 'tahun' => 2024, 'bulan' => 1, 'jumlah_stunting' => 24560],
+            ['id_wilayah' => 9, 'tahun' => 2024, 'bulan' => 1, 'jumlah_stunting' => 20783],
+            ['id_wilayah' => 10, 'tahun' => 2024, 'bulan' => 1, 'jumlah_stunting' => 20751],
+            ['id_wilayah' => 11, 'tahun' => 2024, 'bulan' => 1, 'jumlah_stunting' => 14510],
+            ['id_wilayah' => 12, 'tahun' => 2024, 'bulan' => 1, 'jumlah_stunting' => 7012],
+            ['id_wilayah' => 13, 'tahun' => 2024, 'bulan' => 1, 'jumlah_stunting' => 30609],
+            ['id_wilayah' => 14, 'tahun' => 2024, 'bulan' => 1, 'jumlah_stunting' => 28675],
+            ['id_wilayah' => 15, 'tahun' => 2024, 'bulan' => 1, 'jumlah_stunting' => 2775],
+            ['id_wilayah' => 16, 'tahun' => 2024, 'bulan' => 1, 'jumlah_stunting' => 8363],
+            ['id_wilayah' => 17, 'tahun' => 2024, 'bulan' => 1, 'jumlah_stunting' => 5819],
+            ['id_wilayah' => 18, 'tahun' => 2024, 'bulan' => 1, 'jumlah_stunting' => 14994],
+            ['id_wilayah' => 19, 'tahun' => 2024, 'bulan' => 1, 'jumlah_stunting' => 15229],
+            ['id_wilayah' => 20, 'tahun' => 2024, 'bulan' => 1, 'jumlah_stunting' => 9133],
+            ['id_wilayah' => 21, 'tahun' => 2024, 'bulan' => 1, 'jumlah_stunting' => 14437],
+            ['id_wilayah' => 22, 'tahun' => 2024, 'bulan' => 1, 'jumlah_stunting' => 11307],
+            ['id_wilayah' => 23, 'tahun' => 2024, 'bulan' => 1, 'jumlah_stunting' => 9618],
+            ['id_wilayah' => 24, 'tahun' => 2024, 'bulan' => 1, 'jumlah_stunting' => 11804],
+            ['id_wilayah' => 25, 'tahun' => 2024, 'bulan' => 1, 'jumlah_stunting' => 8203],
+            ['id_wilayah' => 26, 'tahun' => 2024, 'bulan' => 1, 'jumlah_stunting' => 40486],
+            ['id_wilayah' => 27, 'tahun' => 2024, 'bulan' => 1, 'jumlah_stunting' => 6517],
+            ['id_wilayah' => 28, 'tahun' => 2024, 'bulan' => 1, 'jumlah_stunting' => 6265],
+            ['id_wilayah' => 29, 'tahun' => 2024, 'bulan' => 1, 'jumlah_stunting' => 3487],
+            ['id_wilayah' => 30, 'tahun' => 2024, 'bulan' => 1, 'jumlah_stunting' => 3692],
+            ['id_wilayah' => 31, 'tahun' => 2024, 'bulan' => 1, 'jumlah_stunting' => 2988],
+            ['id_wilayah' => 32, 'tahun' => 2024, 'bulan' => 1, 'jumlah_stunting' => 6756],
+            ['id_wilayah' => 33, 'tahun' => 2024, 'bulan' => 1, 'jumlah_stunting' => 7642]
+        ];
 
         foreach ($dataStunting as $data) {
             Stunting::create($data);

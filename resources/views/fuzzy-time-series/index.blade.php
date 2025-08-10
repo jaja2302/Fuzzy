@@ -100,8 +100,8 @@
                                     <select name="wilayah_id" id="wilayah_id" class="form-select form-control-custom">
                                         <option value="">Semua Wilayah</option>
                                         @foreach($wilayahs as $wilayah)
-                                            <option value="{{ $wilayah->id }}">
-                                                {{ $wilayah->nama_wilayah }} - {{ $wilayah->kode_wilayah }}
+                                            <option value="{{ $wilayah->ID_Wilayah }}">
+                                                {{ $wilayah->nama_wilayah }}
                                             </option>
                                         @endforeach
                                     </select>

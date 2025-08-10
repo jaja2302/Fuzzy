@@ -13,7 +13,7 @@ class WilayahController extends Controller
      */
     public function index()
     {
-        $wilayahs = Wilayah::orderBy('nama_wilayah')->paginate(10);
+        $wilayahs = Wilayah::orderBy('Kabupaten')->paginate(10);
         return view('wilayah.index', compact('wilayahs'));
     }
 
@@ -31,17 +31,8 @@ class WilayahController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'nama_wilayah' => 'required|string|max:255',
-            'kode_wilayah' => 'required|string|max:50|unique:wilayahs',
-            'deskripsi' => 'nullable|string',
-            'provinsi' => 'nullable|string|max:100',
-            'kabupaten' => 'nullable|string|max:100',
-            'kecamatan' => 'nullable|string|max:100',
-            'desa' => 'nullable|string|max:100',
-            'jumlah_penduduk' => 'nullable|integer|min:0',
-            'luas_wilayah' => 'nullable|numeric|min:0',
-            'satuan_luas' => 'nullable|string|max:20',
-            'status_aktif' => 'boolean'
+            'Provinsi' => 'required|string|max:100',
+            'Kabupaten' => 'required|string|max:100'
         ]);
 
         if ($validator->fails()) {
@@ -61,7 +52,7 @@ class WilayahController extends Controller
      */
     public function show(Wilayah $wilayah)
     {
-        $stuntings = $wilayah->stuntings()->orderBy('tahun', 'desc')->orderBy('bulan', 'desc')->paginate(10);
+        $stuntings = $wilayah->stuntings()->orderBy('tahun', 'desc')->paginate(10);
         return view('wilayah.show', compact('wilayah', 'stuntings'));
     }
 
@@ -79,17 +70,8 @@ class WilayahController extends Controller
     public function update(Request $request, Wilayah $wilayah)
     {
         $validator = Validator::make($request->all(), [
-            'nama_wilayah' => 'required|string|max:255',
-            'kode_wilayah' => 'required|string|max:50|unique:wilayahs,kode_wilayah,' . $wilayah->id,
-            'deskripsi' => 'nullable|string',
-            'provinsi' => 'nullable|string|max:100',
-            'kabupaten' => 'nullable|string|max:100',
-            'kecamatan' => 'nullable|string|max:100',
-            'desa' => 'nullable|string|max:100',
-            'jumlah_penduduk' => 'nullable|integer|min:0',
-            'luas_wilayah' => 'nullable|numeric|min:0',
-            'satuan_luas' => 'nullable|string|max:20',
-            'status_aktif' => 'boolean'
+            'Provinsi' => 'required|string|max:100',
+            'Kabupaten' => 'required|string|max:100'
         ]);
 
         if ($validator->fails()) {
