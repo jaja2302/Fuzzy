@@ -374,7 +374,7 @@
                             <span>Fuzzy Time Series</span>
                         </a>
                         
-                        <a href="{{ route('public.results') }}" class="sidebar-link {{ request()->routeIs('public.*') ? 'active' : '' }}">
+                        <a href="{{ route('umum.results') }}" class="sidebar-link {{ request()->routeIs('umum.*') ? 'active' : '' }}">
                             <i class="fas fa-chart-pie"></i>
                             <span>Hasil Publik</span>
                         </a>

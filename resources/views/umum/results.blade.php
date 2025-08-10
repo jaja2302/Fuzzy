@@ -243,7 +243,7 @@
         <!-- Filter Section -->
         <div class="filter-section">
             <h3><i class="fas fa-filter mr-2"></i>Filter Data</h3>
-            <form method="GET" action="{{ route('public.results') }}">
+            <form method="GET" action="{{ route('umum.results') }}">
                 <div class="filter-grid">
                     <div class="form-group">
                         <label for="wilayah_id">Wilayah</label>
@@ -273,7 +273,7 @@
                     <button type="submit" class="btn btn-primary">
                         <i class="fas fa-search mr-2"></i>Analisis Data
                     </button>
-                    <a href="{{ route('public.results') }}" class="btn btn-secondary">
+                    <a href="{{ route('umum.results') }}" class="btn btn-secondary">
                         <i class="fas fa-undo mr-2"></i>Reset
                     </a>
                 </div>

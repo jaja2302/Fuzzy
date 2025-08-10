@@ -492,12 +492,14 @@ $max_year = max($available_years);
                         // Ambil 1 sampel wilayah: pakai pilihan form jika ada, jika tidak ambil wilayah pertama (ASC)
                         $sample_wilayah_id = (isset($_POST['id_wilayah']) && $_POST['id_wilayah'] !== '') ? $_POST['id_wilayah'] : null;
                         if ($sample_wilayah_id === null) {
-                            $qwil = mysqli_query($link, "SELECT ID_Wilayah, Kabupaten FROM wilayah ORDER BY Kabupaten ASC LIMIT 1");
+                            // Gunakan alias agar kompatibel dengan skema kolom huruf kecil di hosting
+                            $qwil = mysqli_query($link, "SELECT id_wilayah AS ID_Wilayah, kabupaten AS Kabupaten FROM wilayah ORDER BY kabupaten ASC LIMIT 1");
                             $rwil = mysqli_fetch_array($qwil);
                             $sample_wilayah_id = $rwil['ID_Wilayah'];
                             $sample_wilayah_nama = $rwil['Kabupaten'];
                         } else {
-                            $qwil = mysqli_query($link, "SELECT Kabupaten FROM wilayah WHERE ID_Wilayah = '" . mysqli_real_escape_string($link, $sample_wilayah_id) . "' LIMIT 1");
+                            // Gunakan alias agar kompatibel dengan skema kolom huruf kecil di hosting
+                            $qwil = mysqli_query($link, "SELECT kabupaten AS Kabupaten FROM wilayah WHERE id_wilayah = '" . mysqli_real_escape_string($link, $sample_wilayah_id) . "' LIMIT 1");
                             $rwil = mysqli_fetch_array($qwil);
                             $sample_wilayah_nama = $rwil ? $rwil['Kabupaten'] : 'Wilayah Terpilih';
                         }
@@ -621,6 +623,11 @@ $max_year = max($available_years);
                             <?php if ($idx_last): ?>
                                 <li>Midpoint <?php echo $fs_t2; ?> = (<?php echo $fmt($intervals_dyn[$idx_last]['lower'], 0); ?> + <?php echo $fmt($intervals_dyn[$idx_last]['upper'], 0); ?>) / 2 = <?php echo $fmt($mid_last, 0); ?></li>
                                 <li><strong>Prediksi <?php echo $tahun2 + 1; ?> ≈ <?php echo $fmt(round($mid_last)); ?></strong></li>
+                                <li><em>Keterangan:</em> pada metode Fuzzy Time Series (Chen), nilai representatif interval ditetapkan sebagai <strong>titik tengah (midpoint)</strong>.<br>
+                                    — Jika <strong>konsekuen tunggal</strong>, maka midpoint = <code>(batas bawah + batas atas) / 2</code>.<br>
+                                    — Jika <strong>konsekuen lebih dari satu</strong>, maka prediksi = <em>rata‑rata midpoint</em> dari seluruh konsekuen: <code>Σ midpoint / jumlah konsekuen</code>. Dengan demikian pembaginya menjadi jumlah konsekuen (tidak selalu 2).<br>
+                                    — Jika <strong>tidak ada konsekuen</strong>, biasanya digunakan midpoint interval asal sebagai fallback.
+                                </li>
                             <?php else: ?>
                                 <li><em>Data tidak lengkap untuk prediksi contoh.</em></li>
                             <?php endif; ?>
@@ -659,7 +666,7 @@ $max_year = max($available_years);
                                 </table>
                             </div>
                         <?php endif; ?>
-                        <small class="text-muted">Catatan: Ganti pilihan <strong>Wilayah</strong> pada form di atas untuk melihat contoh dinamis wilayah lain.</small>
+                        <small class="text-muted">Catatan: Ganti pilihan <strong>Wilayah</strong> pada form di atas untuk melihat contoh dinamis wilayah lain. Kolom <strong>Hasil Interval</strong> menampilkan nilai representatif: jika konsekuen tunggal maka <em>midpoint</em> <code>(bawah + atas)/2</code>; jika konsekuen lebih dari satu maka <em>rata‑rata midpoint</em> seluruh konsekuen (pembagi = jumlah konsekuen).</small>
                     </div>
                 </div>
             </div>
@@ -684,7 +691,8 @@ $max_year = max($available_years);
                             <select name="id_wilayah" id="id_wilayah" class="form-control">
                                 <option value="">-- Semua Wilayah --</option>
                                 <?php
-                                $query = mysqli_query($link, "SELECT * FROM wilayah ORDER BY Kabupaten ASC");
+                                // Gunakan alias agar nama key konsisten di semua lingkungan (hosting/lokal)
+                                $query = mysqli_query($link, "SELECT id_wilayah AS ID_Wilayah, kabupaten AS Kabupaten, provinsi AS Provinsi FROM wilayah ORDER BY kabupaten ASC");
                                 while ($wilayah = mysqli_fetch_array($query)) {
                                     $selected = (isset($_POST['id_wilayah']) && $_POST['id_wilayah'] == $wilayah['ID_Wilayah']) ? 'selected' : '';
                                     echo "<option value='{$wilayah['ID_Wilayah']}' $selected>{$wilayah['Kabupaten']} ({$wilayah['Provinsi']})</option>";
@@ -892,7 +900,7 @@ $max_year = max($available_years);
                                 <th>FUZZY <?php echo $max_year - 1; ?></th>
                                 <th>FUZZY <?php echo $max_year; ?></th>
                                 <th>RELASI</th>
-                                <th>HASIL INTERVAL</th>
+                                <th>HASIL INTERVAL <span title="Jika konsekuen tunggal: midpoint = (bawah + atas)/2. Jika konsekuen > 1: rata‑rata midpoint setiap konsekuen (pembagi = jumlah konsekuen)." style="cursor:help;">?</span></th>
                                 <th>PREDIKSI <?php echo $tahun_perkiraan; ?></th>
                                 <th>DATA <?php echo $max_year - 1; ?></th>
                                 <th>DATA <?php echo $max_year; ?></th>

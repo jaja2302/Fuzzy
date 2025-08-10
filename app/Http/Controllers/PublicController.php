@@ -41,7 +41,7 @@ class PublicController extends Controller
         // Get wilayahs for the filter dropdown
         $wilayahs = Wilayah::where('status_aktif', true)->get();
 
-        return view('public.results', compact('results', 'wilayahs', 'tahunPerkiraan', 'tahunAwal', 'tahunAkhir', 'wilayahId'));
+        return view('umum.results', compact('results', 'wilayahs', 'tahunPerkiraan', 'tahunAwal', 'tahunAkhir', 'wilayahId'));
     }
 
     public function stuntingData()
@@ -95,7 +95,7 @@ class PublicController extends Controller
             ]
         ]);
 
-        return view('public.stunting-data', compact('stuntingData'));
+        return view('umum.stunting-data', compact('stuntingData'));
     }
 
     public function wilayahData()
@@ -149,6 +149,6 @@ class PublicController extends Controller
             ]
         ]);
 
-        return view('public.wilayah-data', compact('wilayahData'));
+        return view('umum.wilayah-data', compact('wilayahData'));
     }
 }

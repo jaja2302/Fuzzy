@@ -17,9 +17,9 @@ Route::get('/clear', function () {
 });
 
 // Public routes (no authentication required)
-Route::get('/public/results', [PublicController::class, 'results'])->name('public.results');
-Route::get('/public/stunting-data', [PublicController::class, 'stuntingData'])->name('public.stunting-data');
-Route::get('/public/wilayah-data', [PublicController::class, 'wilayahData'])->name('public.wilayah-data');
+Route::get('/umum/results', [PublicController::class, 'results'])->name('umum.results');
+Route::get('/umum/stunting-data', [PublicController::class, 'stuntingData'])->name('umum.stunting-data');
+Route::get('/umum/wilayah-data', [PublicController::class, 'wilayahData'])->name('umum.wilayah-data');
 
 // Authentication routes (public)
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
