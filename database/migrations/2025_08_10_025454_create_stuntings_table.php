@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id('id_stunting');
             $table->unsignedBigInteger('id_wilayah');
             $table->integer('tahun');
-            $table->integer('bulan');
             $table->integer('jumlah_stunting');
             $table->timestamps();
             

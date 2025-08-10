@@ -12,7 +12,6 @@ class Stunting extends Model
     protected $fillable = [
         'id_wilayah',
         'tahun',
-        'bulan',
         'jumlah_stunting'
     ];
 

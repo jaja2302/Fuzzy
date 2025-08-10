@@ -16,26 +16,26 @@
             </div>
             
             <div class="p-6">
-                <form action="{{ route('stunting.update', $stunting->id) }}" method="POST">
+                <form action="{{ route('stunting.update', $stunting->id_stunting) }}" method="POST">
                     @csrf
                     @method('PUT')
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <div>
-                            <label for="wilayah_id" class="block text-sm font-medium text-gray-700 mb-2">
+                            <label for="id_wilayah" class="block text-sm font-medium text-gray-700 mb-2">
                                 Wilayah <span class="text-red-500">*</span>
                             </label>
-                            <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('wilayah_id') border-red-500 @enderror" 
-                                    id="wilayah_id" name="wilayah_id" required>
+                            <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('id_wilayah') border-red-500 @enderror" 
+                                    id="id_wilayah" name="id_wilayah" required>
                                 <option value="">Select Wilayah</option>
                                 @foreach($wilayahs as $wilayah)
-                                    <option value="{{ $wilayah->id }}" 
-                                            {{ old('wilayah_id', $stunting->wilayah_id) == $wilayah->id ? 'selected' : '' }}>
-                                        {{ $wilayah->nama ?? $wilayah->nama_wilayah }}
+                                    <option value="{{ $wilayah->ID_Wilayah }}" 
+                                            {{ old('id_wilayah', $stunting->id_wilayah) == $wilayah->ID_Wilayah ? 'selected' : '' }}>
+                                        {{ $wilayah->nama_wilayah }}
                                     </option>
                                 @endforeach
                             </select>
-                            @error('wilayah_id')
+                            @error('id_wilayah')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
@@ -61,29 +61,6 @@
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                        <div>
-                            <label for="bulan" class="block text-sm font-medium text-gray-700 mb-2">Bulan</label>
-                            <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('bulan') border-red-500 @enderror" 
-                                    id="bulan" name="bulan">
-                                <option value="">Select Month (Optional)</option>
-                                <option value="1" {{ old('bulan', $stunting->bulan) == '1' ? 'selected' : '' }}>January</option>
-                                <option value="2" {{ old('bulan', $stunting->bulan) == '2' ? 'selected' : '' }}>February</option>
-                                <option value="3" {{ old('bulan', $stunting->bulan) == '3' ? 'selected' : '' }}>March</option>
-                                <option value="4" {{ old('bulan', $stunting->bulan) == '4' ? 'selected' : '' }}>April</option>
-                                <option value="5" {{ old('bulan', $stunting->bulan) == '5' ? 'selected' : '' }}>May</option>
-                                <option value="6" {{ old('bulan', $stunting->bulan) == '6' ? 'selected' : '' }}>June</option>
-                                <option value="7" {{ old('bulan', $stunting->bulan) == '7' ? 'selected' : '' }}>July</option>
-                                <option value="8" {{ old('bulan', $stunting->bulan) == '8' ? 'selected' : '' }}>August</option>
-                                <option value="9" {{ old('bulan', $stunting->bulan) == '9' ? 'selected' : '' }}>September</option>
-                                <option value="10" {{ old('bulan', $stunting->bulan) == '10' ? 'selected' : '' }}>October</option>
-                                <option value="11" {{ old('bulan', $stunting->bulan) == '11' ? 'selected' : '' }}>November</option>
-                                <option value="12" {{ old('bulan', $stunting->bulan) == '12' ? 'selected' : '' }}>December</option>
-                            </select>
-                            @error('bulan')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-                        
                         <div>
                             <label for="jumlah_stunting" class="block text-sm font-medium text-gray-700 mb-2">
                                 Jumlah Stunting <span class="text-red-500">*</span>

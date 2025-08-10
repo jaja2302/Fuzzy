@@ -27,8 +27,8 @@
                         <select name="id_wilayah" id="id_wilayah" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('id_wilayah') border-red-500 @enderror">
                             <option value="">Select Wilayah</option>
                             @foreach($wilayahs as $wilayah)
-                                <option value="{{ $wilayah->id }}" {{ old('id_wilayah') == $wilayah->id ? 'selected' : '' }}>
-                                    {{ $wilayah->nama }}
+                                <option value="{{ $wilayah->ID_Wilayah }}" {{ old('id_wilayah') == $wilayah->ID_Wilayah ? 'selected' : '' }}>
+                                    {{ $wilayah->nama_wilayah }}
                                 </option>
                             @endforeach
                         </select>
@@ -46,15 +46,6 @@
                         @enderror
                     </div>
 
-                    <!-- Jumlah Balita -->
-                    <div>
-                        <label for="jumlah_balita" class="block text-sm font-medium text-gray-700 mb-2">Jumlah Balita *</label>
-                        <input type="number" name="jumlah_balita" id="jumlah_balita" value="{{ old('jumlah_balita') }}" min="0" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('jumlah_balita') border-red-500 @enderror">
-                        @error('jumlah_balita')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-
                     <!-- Jumlah Stunting -->
                     <div>
                         <label for="jumlah_stunting" class="block text-sm font-medium text-gray-700 mb-2">Jumlah Stunting *</label>
@@ -62,15 +53,6 @@
                         @error('jumlah_stunting')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
-                    </div>
-                </div>
-
-                <!-- Persentase (Auto-calculated) -->
-                <div class="mt-6">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Persentase Stunting</label>
-                    <div class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-700">
-                        <span id="persentase-display">0.00%</span>
-                        <span class="text-sm text-gray-500 ml-2">(Auto-calculated)</span>
                     </div>
                 </div>
 
@@ -87,27 +69,4 @@
         </div>
     </div>
 </div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const jumlahBalitaInput = document.getElementById('jumlah_balita');
-    const jumlahStuntingInput = document.getElementById('jumlah_stunting');
-    const persentaseDisplay = document.getElementById('persentase-display');
-    
-    function calculatePersentase() {
-        const balita = parseFloat(jumlahBalitaInput.value) || 0;
-        const stunting = parseFloat(jumlahStuntingInput.value) || 0;
-        
-        if (balita > 0) {
-            const persentase = (stunting / balita) * 100;
-            persentaseDisplay.textContent = persentase.toFixed(2) + '%';
-        } else {
-            persentaseDisplay.textContent = '0.00%';
-        }
-    }
-    
-    jumlahBalitaInput.addEventListener('input', calculatePersentase);
-    jumlahStuntingInput.addEventListener('input', calculatePersentase);
-});
-</script>
 @endsection

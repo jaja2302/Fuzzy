@@ -50,8 +50,8 @@ class StuntingController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'id_wilayah' => 'required|exists:wilayahs,ID_Wilayah',
-            'tahun' => 'required|string|max:20',
-            'jumlah' => 'required|string|max:20'
+            'tahun' => 'required|integer',
+            'jumlah_stunting' => 'required|integer'
         ]);
 
         if ($validator->fails()) {
@@ -67,31 +67,35 @@ class StuntingController extends Controller
         
         if ($existing) {
             return redirect()->back()
-                ->withErrors(['tahun' => 'Data untuk wilayah dan tahun ini sudah ada.'])
+                ->withErrors(['duplicate' => 'Data stunting untuk wilayah dan tahun ini sudah ada.'])
                 ->withInput();
         }
 
-        Stunting::create($request->all());
+        Stunting::create([
+            'id_wilayah' => $request->id_wilayah,
+            'tahun' => $request->tahun,
+            'jumlah_stunting' => $request->jumlah_stunting
+        ]);
 
         return redirect()->route('stunting.index')
-            ->with('success', 'Data stunting berhasil ditambahkan!');
+            ->with('success', 'Data stunting berhasil ditambahkan.');
     }
 
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show($id_stunting)
     {
-        $stunting = Stunting::where('id_stunting', $id)->firstOrFail();
+        $stunting = Stunting::where('id_stunting', $id_stunting)->firstOrFail();
         return view('stunting.show', compact('stunting'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit($id)
+    public function edit($id_stunting)
     {
-        $stunting = Stunting::where('id_stunting', $id)->firstOrFail();
+        $stunting = Stunting::where('id_stunting', $id_stunting)->firstOrFail();
         $wilayahs = Wilayah::orderBy('Kabupaten')->get();
         return view('stunting.edit', compact('stunting', 'wilayahs'));
     }
@@ -99,14 +103,14 @@ class StuntingController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $id_stunting)
     {
-        $stunting = Stunting::where('id_stunting', $id)->firstOrFail();
+        $stunting = Stunting::where('id_stunting', $id_stunting)->firstOrFail();
         
         $validator = Validator::make($request->all(), [
             'id_wilayah' => 'required|exists:wilayahs,ID_Wilayah',
-            'tahun' => 'required|string|max:20',
-            'jumlah' => 'required|string|max:20'
+            'tahun' => 'required|integer',
+            'jumlah_stunting' => 'required|integer'
         ]);
 
         if ($validator->fails()) {
@@ -118,27 +122,31 @@ class StuntingController extends Controller
         // Check for duplicate data (excluding current record)
         $existing = Stunting::where('id_wilayah', $request->id_wilayah)
                            ->where('tahun', $request->tahun)
-                           ->where('id_stunting', '!=', $stunting->id_stunting)
+                           ->where('id_stunting', '!=', $id_stunting)
                            ->first();
         
         if ($existing) {
             return redirect()->back()
-                ->withErrors(['tahun' => 'Data untuk wilayah dan tahun ini sudah ada.'])
+                ->withErrors(['duplicate' => 'Data stunting untuk wilayah dan tahun ini sudah ada.'])
                 ->withInput();
         }
 
-        $stunting->update($request->all());
+        $stunting->update([
+            'id_wilayah' => $request->id_wilayah,
+            'tahun' => $request->tahun,
+            'jumlah_stunting' => $request->jumlah_stunting
+        ]);
 
         return redirect()->route('stunting.index')
-            ->with('success', 'Data stunting berhasil diperbarui!');
+            ->with('success', 'Data stunting berhasil diperbarui.');
     }
 
     /**
      * Remove the specified resource in storage.
      */
-    public function destroy($id)
+    public function destroy($id_stunting)
     {
-        $stunting = Stunting::where('id_stunting', $id)->firstOrFail();
+        $stunting = Stunting::where('id_stunting', $id_stunting)->firstOrFail();
         $stunting->delete();
         return redirect()->route('stunting.index')
             ->with('success', 'Data stunting berhasil dihapus!');

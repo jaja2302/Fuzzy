@@ -33,7 +33,9 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('wilayah', WilayahController::class);
         
         // Stunting data management
-        Route::resource('stunting', StuntingController::class);
+        Route::resource('stunting', StuntingController::class)->parameters([
+            'stunting' => 'id_stunting'
+        ]);
     });
     
     // Fuzzy Time Series routes

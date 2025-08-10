@@ -35,30 +35,26 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Wilayah</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tahun</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jumlah Balita</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jumlah Stunting</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Persentase</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     @forelse($stuntings as $stunting)
                         <tr class="hover:bg-gray-50">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $stunting->id }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $stunting->wilayah->nama ?? 'N/A' }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $stunting->id_stunting }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $stunting->wilayah->nama_wilayah ?? 'N/A' }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $stunting->tahun }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $stunting->jumlah_balita }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $stunting->jumlah_stunting }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ number_format($stunting->persentase, 2) }}%</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <div class="flex space-x-2">
-                                    <a href="{{ route('stunting.show', $stunting->id) }}" class="text-blue-600 hover:text-blue-900">
+                                    <a href="{{ route('stunting.show', $stunting->id_stunting) }}" class="text-blue-600 hover:text-blue-900">
                                         <i class="fas fa-eye"></i>
                                     </a>
-                                    <a href="{{ route('stunting.edit', $stunting->id) }}" class="text-indigo-600 hover:text-indigo-900">
+                                    <a href="{{ route('stunting.edit', $stunting->id_stunting) }}" class="text-indigo-600 hover:text-indigo-900">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <form action="{{ route('stunting.destroy', $stunting->id) }}" method="POST" class="inline">
+                                    <form action="{{ route('stunting.destroy', $stunting->id_stunting) }}" method="POST" class="inline">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="text-red-600 hover:text-red-900" onclick="return confirm('Are you sure you want to delete this record?')">
@@ -70,7 +66,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="px-6 py-4 text-center text-gray-500">
+                            <td colspan="6" class="px-6 py-4 text-center text-gray-500">
                                 No stunting data found.
                             </td>
                         </tr>

@@ -10,7 +10,7 @@
                 <div class="flex justify-between items-center">
                     <h1 class="text-2xl font-bold text-white">Stunting Data Detail</h1>
                     <div class="flex space-x-2">
-                        <a href="{{ route('stunting.edit', $stunting->id) }}" class="inline-flex items-center px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white font-medium rounded-lg transition-colors duration-200">
+                        <a href="{{ route('stunting.edit', $stunting->id_stunting) }}" class="inline-flex items-center px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white font-medium rounded-lg transition-colors duration-200">
                             <i class="fas fa-edit mr-2"></i>Edit
                         </a>
                         <a href="{{ route('stunting.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-lg transition-colors duration-200">
@@ -25,14 +25,14 @@
                     <!-- ID -->
                     <div class="bg-gray-50 p-4 rounded-lg">
                         <label class="block text-sm font-semibold text-gray-700 mb-2">ID</label>
-                        <p class="text-lg font-mono text-gray-900">{{ $stunting->id }}</p>
+                        <p class="text-lg font-mono text-gray-900">{{ $stunting->id_stunting }}</p>
                     </div>
                     
                     <!-- Wilayah -->
                     <div class="bg-gray-50 p-4 rounded-lg">
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Wilayah</label>
                         <p class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                            {{ $stunting->wilayah->nama ?? 'N/A' }}
+                            {{ $stunting->wilayah->nama_wilayah ?? 'N/A' }}
                         </p>
                     </div>
                 </div>
@@ -46,39 +46,11 @@
                         </p>
                     </div>
                     
-                    <!-- Bulan -->
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Bulan</label>
-                        <p class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
-                            @if($stunting->bulan)
-                                {{ date('F', mktime(0, 0, 0, $stunting->bulan, 1)) }}
-                            @else
-                                <span class="text-gray-500">-</span>
-                            @endif
-                        </p>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                    <!-- Jumlah Balita -->
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Jumlah Balita</label>
-                        <p class="text-2xl font-bold text-green-600">{{ number_format($stunting->jumlah_balita ?? 0) }}</p>
-                    </div>
-                    
                     <!-- Jumlah Stunting -->
                     <div class="bg-gray-50 p-4 rounded-lg">
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Jumlah Stunting</label>
                         <p class="text-2xl font-bold text-red-600">{{ number_format($stunting->jumlah_stunting) }}</p>
                     </div>
-                </div>
-
-                <!-- Persentase -->
-                <div class="bg-gray-50 p-4 rounded-lg mb-6">
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Persentase Stunting</label>
-                    <p class="text-3xl font-bold text-purple-600">
-                        {{ number_format(($stunting->jumlah_stunting / ($stunting->jumlah_balita ?? 1)) * 100, 2) }}%
-                    </p>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
@@ -99,7 +71,7 @@
 
                 <!-- Action Buttons -->
                 <div class="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3">
-                    <form action="{{ route('stunting.destroy', $stunting->id) }}" method="POST" class="inline">
+                    <form action="{{ route('stunting.destroy', $stunting->id_stunting) }}" method="POST" class="inline">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="w-full sm:w-auto px-6 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors duration-200" onclick="return confirm('Are you sure you want to delete this record?')">
