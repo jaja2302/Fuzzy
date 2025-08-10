@@ -13,7 +13,7 @@ class WilayahController extends Controller
      */
     public function index()
     {
-        $wilayahs = Wilayah::orderBy('Kabupaten')->paginate(10);
+        $wilayahs = Wilayah::orderBy('ID_Wilayah', 'desc')->paginate(10);
         return view('wilayah.index', compact('wilayahs'));
     }
 
@@ -33,8 +33,14 @@ class WilayahController extends Controller
         $validator = Validator::make($request->all(), [
             'Provinsi' => 'required|string|max:100',
             'Kabupaten' => 'required|string|max:100',
-            'nama_wilayah' => 'nullable|string|max:200',
+            'nama_wilayah' => 'nullable|string|max:255',
             'status_aktif' => 'boolean'
+        ], [
+            'Provinsi.required' => 'Provinsi harus diisi',
+            'Provinsi.max' => 'Provinsi maksimal 100 karakter',
+            'Kabupaten.required' => 'Kabupaten harus diisi',
+            'Kabupaten.max' => 'Kabupaten maksimal 100 karakter',
+            'nama_wilayah.max' => 'Nama wilayah maksimal 255 karakter'
         ]);
 
         if ($validator->fails()) {
@@ -43,21 +49,28 @@ class WilayahController extends Controller
                 ->withInput();
         }
 
-        $data = $request->all();
-        $data['status_aktif'] = $request->has('status_aktif') ? true : false;
-        
-        Wilayah::create($data);
+        try {
+            $wilayah = new Wilayah();
+            $wilayah->Provinsi = $request->Provinsi;
+            $wilayah->Kabupaten = $request->Kabupaten;
+            $wilayah->nama_wilayah = $request->nama_wilayah ?: $request->Provinsi . ' - ' . $request->Kabupaten;
+            $wilayah->status_aktif = $request->has('status_aktif');
+            $wilayah->save();
 
-        return redirect()->route('wilayah.index')
-            ->with('success', 'Wilayah berhasil ditambahkan!');
+            return redirect()->route('wilayah.index')
+                ->with('success', 'Wilayah berhasil ditambahkan!');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage())
+                ->withInput();
+        }
     }
 
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show(Wilayah $wilayah)
     {
-        $wilayah = Wilayah::where('ID_Wilayah', $id)->firstOrFail();
         $stuntings = $wilayah->stuntings()->orderBy('tahun', 'desc')->paginate(10);
         return view('wilayah.show', compact('wilayah', 'stuntings'));
     }
@@ -65,24 +78,27 @@ class WilayahController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit($id)
+    public function edit(Wilayah $wilayah)
     {
-        $wilayah = Wilayah::where('ID_Wilayah', $id)->firstOrFail();
         return view('wilayah.edit', compact('wilayah'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Wilayah $wilayah)
     {
-        $wilayah = Wilayah::where('ID_Wilayah', $id)->firstOrFail();
-        
         $validator = Validator::make($request->all(), [
             'Provinsi' => 'required|string|max:100',
             'Kabupaten' => 'required|string|max:100',
-            'nama_wilayah' => 'nullable|string|max:200',
+            'nama_wilayah' => 'nullable|string|max:255',
             'status_aktif' => 'boolean'
+        ], [
+            'Provinsi.required' => 'Provinsi harus diisi',
+            'Provinsi.max' => 'Provinsi maksimal 100 karakter',
+            'Kabupaten.required' => 'Kabupaten harus diisi',
+            'Kabupaten.max' => 'Kabupaten maksimal 100 karakter',
+            'nama_wilayah.max' => 'Nama wilayah maksimal 255 karakter'
         ]);
 
         if ($validator->fails()) {
@@ -91,28 +107,34 @@ class WilayahController extends Controller
                 ->withInput();
         }
 
-        $data = $request->all();
-        $data['status_aktif'] = $request->has('status_aktif') ? true : false;
-        
-        $wilayah->update($data);
+        try {
+            $wilayah->Provinsi = $request->Provinsi;
+            $wilayah->Kabupaten = $request->Kabupaten;
+            $wilayah->nama_wilayah = $request->nama_wilayah ?: $request->Provinsi . ' - ' . $request->Kabupaten;
+            $wilayah->status_aktif = $request->has('status_aktif');
+            $wilayah->save();
 
-        return redirect()->route('wilayah.index')
-            ->with('success', 'Wilayah berhasil diperbarui!');
+            return redirect()->route('wilayah.index')
+                ->with('success', 'Wilayah berhasil diperbarui!');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage())
+                ->withInput();
+        }
     }
 
     /**
-     * Remove the specified resource in storage.
+     * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy(Wilayah $wilayah)
     {
         try {
-            $wilayah = Wilayah::where('ID_Wilayah', $id)->firstOrFail();
             $wilayah->delete();
             return redirect()->route('wilayah.index')
                 ->with('success', 'Wilayah berhasil dihapus!');
         } catch (\Exception $e) {
-            return redirect()->route('wilayah.index')
-                ->with('error', 'Gagal menghapus wilayah. Pastikan tidak ada data stunting yang terkait.');
+            return redirect()->back()
+                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
 }
