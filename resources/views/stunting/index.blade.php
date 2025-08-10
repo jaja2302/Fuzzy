@@ -1,132 +1,89 @@
 @extends('layouts.app')
 
+@section('page-title', 'Stunting Data')
+
 @section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h4 class="mb-0">Data Stunting</h4>
-                    <a href="{{ route('stunting.create') }}" class="btn btn-primary">
-                        <i class="fas fa-plus"></i> Tambah Data
-                    </a>
-                </div>
-                <div class="card-body">
-                    <!-- Filter Section -->
-                    <div class="row mb-3">
-                        <div class="col-md-3">
-                            <label for="id_wilayah" class="form-label">Wilayah</label>
-                            <select class="form-select" id="id_wilayah" name="id_wilayah">
-                                <option value="">Semua Wilayah</option>
-                                @foreach($wilayahs as $wilayah)
-                                    <option value="{{ $wilayah->ID_Wilayah }}" {{ request('id_wilayah') == $wilayah->ID_Wilayah ? 'selected' : '' }}>
-                                        {{ $wilayah->Kabupaten }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label for="tahun" class="form-label">Tahun</label>
-                            <select class="form-select" id="tahun" name="tahun">
-                                <option value="">Semua Tahun</option>
-                                @for($year = date('Y'); $year >= 2000; $year--)
-                                    <option value="{{ $year }}" {{ request('tahun') == $year ? 'selected' : '' }}>
-                                        {{ $year }}
-                                    </option>
-                                @endfor
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">&nbsp;</label>
-                            <button type="button" class="btn btn-secondary d-block" onclick="applyFilter()">
-                                <i class="fas fa-filter"></i> Filter
-                            </button>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">&nbsp;</label>
-                            <a href="{{ route('stunting.index') }}" class="btn btn-outline-secondary d-block">
-                                <i class="fas fa-times"></i> Reset
-                            </a>
-                        </div>
-                    </div>
+<div class="p-6">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-gray-900">Stunting Data</h1>
+        <a href="{{ route('stunting.create') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200">
+            <i class="fas fa-plus mr-2"></i>Add New Data
+        </a>
+    </div>
 
-                    <!-- Data Table -->
-                    <div class="table-responsive">
-                        <table class="table table-striped table-hover">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th>No</th>
-                                    <th>Wilayah</th>
-                                    <th>Tahun</th>
-                                    <th>Jumlah Stunting</th>
-                                    <th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse($stuntings as $index => $stunting)
-                                <tr>
-                                    <td>{{ $stuntings->firstItem() + $index }}</td>
-                                    <td>{{ $stunting->wilayah->Kabupaten }}</td>
-                                    <td>{{ $stunting->tahun }}</td>
-                                    <td>
-                                        <span class="badge bg-danger">{{ number_format($stunting->jumlah_stunting) }}</span>
-                                    </td>
-                                    <td>
-                                        <div class="btn-group" role="group">
-                                            <a href="{{ route('stunting.show', $stunting->id_stunting) }}" 
-                                               class="btn btn-sm btn-info" title="Lihat">
-                                                <i class="fas fa-eye"></i>
-                                            </a>
-                                            <a href="{{ route('stunting.edit', $stunting->id_stunting) }}" 
-                                               class="btn btn-sm btn-warning" title="Edit">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
-                                            <form action="{{ route('stunting.destroy', $stunting->id_stunting) }}" 
-                                                  method="POST" class="d-inline" 
-                                                  onsubmit="return confirm('Yakin ingin menghapus data ini?')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-danger" title="Hapus">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </td>
-                                </tr>
-                                @empty
-                                <tr>
-                                    <td colspan="5" class="text-center text-muted">
-                                        <i class="fas fa-inbox fa-2x mb-2"></i>
-                                        <p>Tidak ada data stunting yang ditemukan.</p>
-                                    </td>
-                                </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Pagination -->
-                    <div class="d-flex justify-content-center">
-                        {{ $stuntings->links() }}
-                    </div>
-                </div>
-            </div>
+    @if(session('success'))
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
+            {{ session('success') }}
         </div>
+    @endif
+
+    @if(session('error'))
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+            {{ session('error') }}
+        </div>
+    @endif
+
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-900">Stunting Records</h3>
+        </div>
+        
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Wilayah</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tahun</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jumlah Balita</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jumlah Stunting</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Persentase</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    @forelse($stuntings as $stunting)
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $stunting->id }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $stunting->wilayah->nama ?? 'N/A' }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $stunting->tahun }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $stunting->jumlah_balita }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $stunting->jumlah_stunting }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ number_format($stunting->persentase, 2) }}%</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <div class="flex space-x-2">
+                                    <a href="{{ route('stunting.show', $stunting->id) }}" class="text-blue-600 hover:text-blue-900">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{{ route('stunting.edit', $stunting->id) }}" class="text-indigo-600 hover:text-indigo-900">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form action="{{ route('stunting.destroy', $stunting->id) }}" method="POST" class="inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="text-red-600 hover:text-red-900" onclick="return confirm('Are you sure you want to delete this record?')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="7" class="px-6 py-4 text-center text-gray-500">
+                                No stunting data found.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+        
+        @if($stuntings->hasPages())
+            <div class="px-6 py-4 border-t border-gray-200">
+                {{ $stuntings->links() }}
+            </div>
+        @endif
     </div>
 </div>
-
-<script>
-function applyFilter() {
-    const wilayahId = document.getElementById('id_wilayah').value;
-    const tahun = document.getElementById('tahun').value;
-    
-    let url = '{{ route("stunting.index") }}?';
-    const params = new URLSearchParams();
-    
-    if (wilayahId) params.append('id_wilayah', wilayahId);
-    if (tahun) params.append('tahun', tahun);
-    
-    window.location.href = url + params.toString();
-}
-</script>
 @endsection

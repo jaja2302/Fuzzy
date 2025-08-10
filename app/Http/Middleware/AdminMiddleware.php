@@ -14,6 +14,10 @@ class AdminMiddleware
             return redirect('/login');
         }
 
+        if (!Auth::user()->is_admin) {
+            abort(403, 'Unauthorized access. Admin privileges required.');
+        }
+
         return $next($request);
     }
 }

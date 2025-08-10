@@ -19,8 +19,9 @@ class UserSeeder extends Seeder
             'email' => 'liza@example.com',
             'username' => 'liza',
             'password' => Hash::make('1234'),
+            'is_admin' => true,
         ]);
         
-        $this->command->info('User Liza berhasil dibuat dengan password: 1234');
+        $this->command->info('User Liza berhasil dibuat dengan password: 1234 sebagai admin');
     }
 }

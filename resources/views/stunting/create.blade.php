@@ -1,113 +1,113 @@
 @extends('layouts.app')
 
+@section('page-title', 'Create Stunting Data')
+
 @section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h4 class="mb-0">Tambah Data Stunting</h4>
-                    <a href="{{ route('stunting.index') }}" class="btn btn-outline-secondary">
-                        <i class="fas fa-arrow-left"></i> Kembali
-                    </a>
-                </div>
-                <div class="card-body">
-                    <form action="{{ route('stunting.store') }}" method="POST">
-                        @csrf
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="wilayah_id" class="form-label">Wilayah <span class="text-danger">*</span></label>
-                                    <select class="form-select @error('wilayah_id') is-invalid @enderror" 
-                                            id="wilayah_id" name="wilayah_id" required>
-                                        <option value="">Pilih Wilayah</option>
-                                        @foreach($wilayahs as $wilayah)
-                                            <option value="{{ $wilayah->ID_Wilayah }}" 
-                                                    {{ old('wilayah_id') == $wilayah->ID_Wilayah ? 'selected' : '' }}>
-                                                {{ $wilayah->nama_wilayah }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @error('wilayah_id')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="tahun" class="form-label">Tahun <span class="text-danger">*</span></label>
-                                    <select class="form-select @error('tahun') is-invalid @enderror" 
-                                            id="tahun" name="tahun" required>
-                                        <option value="">Pilih Tahun</option>
-                                        @for($year = date('Y'); $year >= 2000; $year--)
-                                            <option value="{{ $year }}" 
-                                                    {{ old('tahun') == $year ? 'selected' : '' }}>
-                                                {{ $year }}
-                                            </option>
-                                        @endfor
-                                    </select>
-                                    @error('tahun')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
+<div class="p-6">
+    <div class="max-w-4xl mx-auto">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-3xl font-bold text-gray-900">Create New Stunting Data</h1>
+            <a href="{{ route('stunting.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-lg transition-colors duration-200">
+                <i class="fas fa-arrow-left mr-2"></i>Back to List
+            </a>
+        </div>
 
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="bulan" class="form-label">Bulan</label>
-                                    <select class="form-select @error('bulan') is-invalid @enderror" 
-                                            id="bulan" name="bulan">
-                                        <option value="">Pilih Bulan (Opsional)</option>
-                                        <option value="1" {{ old('bulan') == '1' ? 'selected' : '' }}>Januari</option>
-                                        <option value="2" {{ old('bulan') == '2' ? 'selected' : '' }}>Februari</option>
-                                        <option value="3" {{ old('bulan') == '3' ? 'selected' : '' }}>Maret</option>
-                                        <option value="4" {{ old('bulan') == '4' ? 'selected' : '' }}>April</option>
-                                        <option value="5" {{ old('bulan') == '5' ? 'selected' : '' }}>Mei</option>
-                                        <option value="6" {{ old('bulan') == '6' ? 'selected' : '' }}>Juni</option>
-                                        <option value="7" {{ old('bulan') == '7' ? 'selected' : '' }}>Juli</option>
-                                        <option value="8" {{ old('bulan') == '8' ? 'selected' : '' }}>Agustus</option>
-                                        <option value="9" {{ old('bulan') == '9' ? 'selected' : '' }}>September</option>
-                                        <option value="10" {{ old('bulan') == '10' ? 'selected' : '' }}>Oktober</option>
-                                        <option value="11" {{ old('bulan') == '11' ? 'selected' : '' }}>November</option>
-                                        <option value="12" {{ old('bulan') == '12' ? 'selected' : '' }}>Desember</option>
-                                    </select>
-                                    @error('bulan')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="jumlah_stunting" class="form-label">Jumlah Stunting <span class="text-danger">*</span></label>
-                                    <input type="number" class="form-control @error('jumlah_stunting') is-invalid @enderror" 
-                                           id="jumlah_stunting" name="jumlah_stunting" 
-                                           value="{{ old('jumlah_stunting') }}" 
-                                           min="0" step="1" required 
-                                           placeholder="Masukkan jumlah stunting">
-                                    @error('jumlah_stunting')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                            <button type="reset" class="btn btn-outline-secondary me-md-2">
-                                <i class="fas fa-undo"></i> Reset
-                            </button>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save"></i> Simpan
-                            </button>
-                        </div>
-                    </form>
-                </div>
+        <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900">Stunting Data Form</h3>
             </div>
+            
+            <form action="{{ route('stunting.store') }}" method="POST" class="p-6">
+                @csrf
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Wilayah Selection -->
+                    <div>
+                        <label for="id_wilayah" class="block text-sm font-medium text-gray-700 mb-2">Wilayah *</label>
+                        <select name="id_wilayah" id="id_wilayah" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('id_wilayah') border-red-500 @enderror">
+                            <option value="">Select Wilayah</option>
+                            @foreach($wilayahs as $wilayah)
+                                <option value="{{ $wilayah->id }}" {{ old('id_wilayah') == $wilayah->id ? 'selected' : '' }}>
+                                    {{ $wilayah->nama }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('id_wilayah')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Tahun -->
+                    <div>
+                        <label for="tahun" class="block text-sm font-medium text-gray-700 mb-2">Tahun *</label>
+                        <input type="number" name="tahun" id="tahun" value="{{ old('tahun') }}" min="2000" max="{{ date('Y') + 1 }}" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('tahun') border-red-500 @enderror">
+                        @error('tahun')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Jumlah Balita -->
+                    <div>
+                        <label for="jumlah_balita" class="block text-sm font-medium text-gray-700 mb-2">Jumlah Balita *</label>
+                        <input type="number" name="jumlah_balita" id="jumlah_balita" value="{{ old('jumlah_balita') }}" min="0" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('jumlah_balita') border-red-500 @enderror">
+                        @error('jumlah_balita')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Jumlah Stunting -->
+                    <div>
+                        <label for="jumlah_stunting" class="block text-sm font-medium text-gray-700 mb-2">Jumlah Stunting *</label>
+                        <input type="number" name="jumlah_stunting" id="jumlah_stunting" value="{{ old('jumlah_stunting') }}" min="0" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('jumlah_stunting') border-red-500 @enderror">
+                        @error('jumlah_stunting')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+
+                <!-- Persentase (Auto-calculated) -->
+                <div class="mt-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Persentase Stunting</label>
+                    <div class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-700">
+                        <span id="persentase-display">0.00%</span>
+                        <span class="text-sm text-gray-500 ml-2">(Auto-calculated)</span>
+                    </div>
+                </div>
+
+                <!-- Submit Buttons -->
+                <div class="flex justify-end space-x-3 mt-8">
+                    <a href="{{ route('stunting.index') }}" class="px-6 py-2 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors duration-200">
+                        Cancel
+                    </a>
+                    <button type="submit" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200">
+                        <i class="fas fa-save mr-2"></i>Save Data
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const jumlahBalitaInput = document.getElementById('jumlah_balita');
+    const jumlahStuntingInput = document.getElementById('jumlah_stunting');
+    const persentaseDisplay = document.getElementById('persentase-display');
+    
+    function calculatePersentase() {
+        const balita = parseFloat(jumlahBalitaInput.value) || 0;
+        const stunting = parseFloat(jumlahStuntingInput.value) || 0;
+        
+        if (balita > 0) {
+            const persentase = (stunting / balita) * 100;
+            persentaseDisplay.textContent = persentase.toFixed(2) + '%';
+        } else {
+            persentaseDisplay.textContent = '0.00%';
+        }
+    }
+    
+    jumlahBalitaInput.addEventListener('input', calculatePersentase);
+    jumlahStuntingInput.addEventListener('input', calculatePersentase);
+});
+</script>
 @endsection
