@@ -10,6 +10,11 @@ use App\Http\Controllers\PublicController;
 Route::get('/', function () {
     return view('welcome');
 });
+Route::get('/clear', function () {
+    Artisan::call('config:clear');
+    Artisan::call('cache:clear');
+    return 'Cache cleared';
+});
 
 // Public routes (no authentication required)
 Route::get('/public/results', [PublicController::class, 'results'])->name('public.results');
