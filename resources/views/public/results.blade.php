@@ -3,316 +3,546 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hasil Analisis - Fuzzy Time Series</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title>Hasil Perhitungan FTS - Fuzzy Time Series</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8fafc;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 0;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 300;
+        }
+        .header p {
+            margin: 10px 0 0 0;
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        .filter-section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        .filter-section h3 {
+            margin: 0 0 20px 0;
+            color: #374151;
+            font-size: 1.3rem;
+        }
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group label {
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+        }
+        .form-group select,
+        .form-group input {
+            padding: 10px 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+        .form-group select:focus,
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .filter-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(102, 126, 234, 0.4);
+        }
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+        .results-section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+        .section-header {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            padding: 20px 25px;
+            margin: 0;
+        }
+        .section-content {
+            padding: 25px;
+        }
+        .table-container {
+            overflow-x: auto;
+        }
+        .table-auto {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .table-auto th {
+            background-color: #f3f4f6;
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #374151;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        .table-auto td {
+            padding: 15px 12px;
+            border-bottom: 1px solid #e5e7eb;
+            vertical-align: top;
+        }
+        .table-auto tbody tr:hover {
+            background-color: #f9fafb;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .status-up {
+            background-color: #10b981;
+            color: white;
+        }
+        .status-down {
+            background-color: #ef4444;
+            color: white;
+        }
+        .type-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .type-validation {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .type-prediction {
+            background-color: #f59e0b;
+            color: white;
+        }
+        .chart-section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+        .chart-header {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 20px 25px;
+            margin: 0;
+        }
+        .chart-content {
+            padding: 25px;
+        }
+        .info-box {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .info-box h6 {
+            margin: 0 0 15px 0;
+            color: #1e40af;
+            font-size: 1.1rem;
+        }
+        .info-box ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .info-box li {
+            margin-bottom: 8px;
+            color: #1e40af;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b7280;
+        }
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        .empty-state h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.5rem;
+        }
+        .empty-state p {
+            margin: 0;
+            font-size: 1.1rem;
+        }
+    </style>
 </head>
-<body class="bg-gray-50">
-    <!-- Navigation -->
-    <nav class="bg-white shadow-lg">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                        <a href="/" class="flex items-center">
-                            <i class="fas fa-brain text-indigo-600 text-2xl"></i>
-                            <span class="ml-2 text-xl font-bold text-gray-900">Fuzzy System</span>
-                        </a>
+<body>
+    <div class="header">
+        <div class="container">
+            <h1><i class="fas fa-chart-line mr-3"></i>Fuzzy Time Series Analysis</h1>
+            <p>Analisis dan Prediksi Data Stunting menggunakan Metode Fuzzy Time Series</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <h3><i class="fas fa-filter mr-2"></i>Filter Data</h3>
+            <form method="GET" action="{{ route('public.results') }}">
+                <div class="filter-grid">
+                    <div class="form-group">
+                        <label for="wilayah_id">Wilayah</label>
+                        <select name="wilayah_id" id="wilayah_id">
+                            <option value="">Semua Wilayah</option>
+                            @foreach($wilayahs as $wilayah)
+                                <option value="{{ $wilayah->id }}" {{ $wilayahId == $wilayah->id ? 'selected' : '' }}>
+                                    {{ $wilayah->nama_wilayah }}, {{ $wilayah->provinsi }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="tahun_awal">Tahun Awal</label>
+                        <input type="number" name="tahun_awal" id="tahun_awal" value="{{ $tahunAwal }}" min="2010" max="2030">
+                    </div>
+                    <div class="form-group">
+                        <label for="tahun_akhir">Tahun Akhir</label>
+                        <input type="number" name="tahun_akhir" id="tahun_akhir" value="{{ $tahunAkhir }}" min="2010" max="2030">
+                    </div>
+                    <div class="form-group">
+                        <label for="tahun_perkiraan">Tahun Prediksi</label>
+                        <input type="number" name="tahun_perkiraan" id="tahun_perkiraan" value="{{ $tahunPerkiraan }}" min="2010" max="2030">
                     </div>
                 </div>
-                <div class="flex items-center space-x-4">
-                    <a href="/" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out">
-                        Home
+                <div class="filter-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search mr-2"></i>Analisis Data
+                    </button>
+                    <a href="{{ route('public.results') }}" class="btn btn-secondary">
+                        <i class="fas fa-undo mr-2"></i>Reset
                     </a>
-                    @auth
-                        <a href="{{ url('/dashboard') }}" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out">
-                            Dashboard
-                        </a>
-                    @else
-                        <a href="{{ route('login') }}" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out">
-                            Login
-                        </a>
-                        <a href="{{ route('register') }}" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out">
-                            Register
-                        </a>
-                    @endauth
                 </div>
-            </div>
+            </form>
         </div>
-    </nav>
 
-    <!-- Header -->
-    <div class="bg-white shadow">
-        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-            <h1 class="text-3xl font-bold text-gray-900">Public Results</h1>
-            <p class="mt-2 text-sm text-gray-600">
-                View the latest fuzzy time series analysis results and insights
-            </p>
-        </div>
-    </div>
+        <!-- Results Section -->
+        @if(isset($results) && count($results) > 0)
+            <div class="results-section">
+                <h4 class="section-header">
+                    <i class="fas fa-table mr-2"></i>HASIL PERHITUNGAN FTS
+                </h4>
+                <div class="section-content">
+                    <div class="table-container">
+                        <table class="table-auto border-collapse w-full">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">WILAYAH</th>
+                                    <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">DATA HISTORIS</th>
+                                    <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">FUZZY SET</th>
+                                    <th class="px-4 py-2 text-left text-sm font-semibold text-sm font-semibold text-gray-700">PREDIKSI {{ $tahunPerkiraan ?? date('Y') + 1 }}</th>
+                                    <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">STATUS</th>
+                                    <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">TIPE</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white">
+                                @foreach($results as $data)
+                                    @php
+                                        // Ambil dua data historis terakhir dengan safety check
+                                        $hist = isset($data['data_historis']) && is_array($data['data_historis']) ? $data['data_historis'] : [];
+                                        usort($hist, function ($a, $b) {
+                                            return $a['tahun'] <=> $b['tahun'];
+                                        });
+                                        $countHist = count($hist);
+                                        $prevYear = $countHist >= 2 ? $hist[$countHist - 2]['tahun'] : null;
+                                        $lastYear = $countHist >= 1 ? $hist[$countHist - 1]['tahun'] : null;
+                                        $val_t1 = $countHist >= 2 ? (int)($hist[$countHist - 2]['jumlah'] ?? 0) : 0;
+                                        $val_t2 = $countHist >= 1 ? (int)($hist[$countHist - 1]['jumlah'] ?? 0) : 0;
 
-    <!-- Main Content -->
-    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div class="px-4 py-6 sm:px-0">
-            <!-- Results Overview -->
-            <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="px-4 py-5 sm:p-6">
-                    <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
-                        <i class="fas fa-chart-line text-indigo-600 mr-2"></i>
-                        Fuzzy Time Series Analysis Results
-                    </h3>
-                    
-                    @if(isset($results) && count($results) > 0)
-                        <!-- Results Table -->
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Period
-                                        </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Actual Value
-                                        </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Predicted Value
-                                        </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Error
-                                        </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Accuracy
-                                        </th>
+                                        // Hitung fuzzy set menggunakan helper function
+                                        $fs_t1 = findFuzzySet($val_t1);
+                                        $fs_t2 = findFuzzySet($val_t2);
+                                        
+                                        // Hitung status dengan safety check
+                                        $selisih = $data['selisih'] ?? 0;
+                                        $statusLbl = ($selisih > 0) ? 'Naik' : 'Turun';
+                                        $statusBadge = ($statusLbl === 'Naik') ? 'status-up' : 'status-down';
+                                        $rowClass = ($statusLbl === 'Naik') ? 'bg-green-50' : 'bg-red-50';
+                                    @endphp
+                                    <tr class="{{ $rowClass }}">
+                                        <td class="px-4 py-2 text-sm text-gray-800">
+                                            <strong>{{ $data['nama_wilayah'] ?? 'Unknown' }}</strong><br>
+                                            <small class="text-gray-600">{{ $data['provinsi'] ?? 'Unknown' }}</small>
+                                        </td>
+                                        <td class="px-4 py-2 text-sm text-gray-800">
+                                            <strong>{{ $prevYear }}:</strong> {{ number_format($val_t1) }}<br>
+                                            <strong>{{ $lastYear }}:</strong> {{ number_format($val_t2) }}
+                                        </td>
+                                        <td class="px-4 py-2 text-sm text-gray-800">
+                                            <strong>{{ $prevYear }}:</strong> {{ $fs_t1 }}<br>
+                                            <strong>{{ $lastYear }}:</strong> {{ $fs_t2 }}
+                                        </td>
+                                        <td class="px-4 py-2 text-sm text-gray-800">
+                                            <strong>{{ number_format($data['jumlah_perkiraan']) }}</strong><br>
+                                            <small class="text-gray-600">Midpoint {{ $fs_t2 }}</small>
+                                        </td>
+                                        <td class="px-4 py-2 text-sm text-gray-800">
+                                            <span class="status-badge {{ $statusBadge }}">{{ $statusLbl }}</span><br>
+                                            <small class="text-gray-600">
+                                                Selisih: {{ number_format($data['selisih']) }}
+                                            </small>
+                                        </td>
+                                        <td class="px-4 py-2 text-sm text-gray-800">
+                                            <span class="type-badge {{ $data['tipe'] == 'validasi' ? 'type-validation' : 'type-prediction' }}">
+                                                {{ ucfirst($data['tipe']) }}
+                                            </span>
+                                        </td>
                                     </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
-                                    @foreach($results as $result)
-                                        <tr class="hover:bg-gray-50">
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                                {{ $result->period ?? 'Period ' . $loop->iteration }}
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                {{ number_format($result->actual_value ?? rand(10, 100), 2) }}
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                {{ number_format($result->predicted_value ?? rand(8, 95), 2) }}
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                {{ number_format($result->error ?? rand(1, 15), 2) }}
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                                    {{ number_format($result->accuracy ?? rand(85, 98), 1) }}%
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <!-- Chart -->
-                        <div class="mt-8">
-                            <h4 class="text-lg font-medium text-gray-900 mb-4">Performance Visualization</h4>
-                            <div class="bg-gray-50 p-4 rounded-lg">
-                                <canvas id="resultsChart" width="400" height="200"></canvas>
-                            </div>
-                        </div>
-
-                        <!-- Summary Statistics -->
-                        <div class="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-                            <div class="bg-white overflow-hidden shadow rounded-lg">
-                                <div class="p-5">
-                                    <div class="flex items-center">
-                                        <div class="flex-shrink-0">
-                                            <i class="fas fa-chart-line text-indigo-600 text-2xl"></i>
-                                        </div>
-                                        <div class="ml-5 w-0 flex-1">
-                                            <dl>
-                                                <dt class="text-sm font-medium text-gray-500 truncate">
-                                                    Total Predictions
-                                                </dt>
-                                                <dd class="text-lg font-medium text-gray-900">
-                                                    {{ count($results) }}
-                                                </dd>
-                                            </dl>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="bg-white overflow-hidden shadow rounded-lg">
-                                <div class="p-5">
-                                    <div class="flex items-center">
-                                        <div class="flex-shrink-0">
-                                            <i class="fas fa-bullseye text-green-600 text-2xl"></i>
-                                        </div>
-                                        <div class="ml-5 w-0 flex-1">
-                                            <dl>
-                                                <dt class="text-sm font-medium text-gray-500 truncate">
-                                                    Average Accuracy
-                                                </dt>
-                                                <dd class="text-lg font-medium text-gray-900">
-                                                    {{ number_format(($results->avg('accuracy') ?? 92.5), 1) }}%
-                                                </dd>
-                                            </dl>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="bg-white overflow-hidden shadow rounded-lg">
-                                <div class="p-5">
-                                    <div class="flex items-center">
-                                        <div class="flex-shrink-0">
-                                            <i class="fas fa-exclamation-triangle text-yellow-600 text-2xl"></i>
-                                        </div>
-                                        <div class="ml-5 w-0 flex-1">
-                                            <dl>
-                                                <dt class="text-sm font-medium text-gray-500 truncate">
-                                                    Average Error
-                                                </dt>
-                                                <dd class="text-lg font-medium text-gray-900">
-                                                    {{ number_format(($results->avg('error') ?? 7.5), 2) }}
-                                                </dd>
-                                            </dl>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="bg-white overflow-hidden shadow rounded-lg">
-                                <div class="p-5">
-                                    <div class="flex items-center">
-                                        <div class="flex-shrink-0">
-                                            <i class="fas fa-clock text-blue-600 text-2xl"></i>
-                                        </div>
-                                        <div class="ml-5 w-0 flex-1">
-                                            <dl>
-                                                <dt class="text-sm font-medium text-gray-500 truncate">
-                                                    Last Updated
-                                                </dt>
-                                                <dd class="text-lg font-medium text-gray-900">
-                                                    {{ now()->format('M d, Y') }}
-                                                </dd>
-                                            </dl>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    @else
-                        <!-- No Results Message -->
-                        <div class="text-center py-12">
-                            <i class="fas fa-chart-bar text-gray-400 text-6xl mb-4"></i>
-                            <h3 class="text-lg font-medium text-gray-900 mb-2">No Results Available</h3>
-                            <p class="text-gray-500 mb-6">
-                                There are currently no fuzzy time series results to display.
-                            </p>
-                            <div class="space-x-4">
-                                <a href="{{ route('fuzzy-time-series.index') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
-                                    <i class="fas fa-plus mr-2"></i>
-                                    Generate New Analysis
-                                </a>
-                                <a href="/" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                                    <i class="fas fa-home mr-2"></i>
-                                    Back to Home
-                                </a>
-                            </div>
-                        </div>
-                    @endif
-                </div>
-            </div>
-
-            <!-- Additional Information -->
-            <div class="mt-8 bg-white overflow-hidden shadow rounded-lg">
-                <div class="px-4 py-5 sm:p-6">
-                    <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
-                        <i class="fas fa-info-circle text-blue-600 mr-2"></i>
-                        About These Results
-                    </h3>
-                    <div class="prose prose-sm text-gray-500">
-                        <p class="mb-4">
-                            This page displays the latest results from our fuzzy time series analysis system. 
-                            The fuzzy logic approach allows us to handle uncertainty and imprecision in time series data, 
-                            providing more robust predictions than traditional statistical methods.
-                        </p>
-                        <p class="mb-4">
-                            Key features of our analysis include:
-                        </p>
-                        <ul class="list-disc pl-5 space-y-2">
-                            <li>Fuzzy membership functions for data categorization</li>
-                            <li>Adaptive rule generation based on historical patterns</li>
-                            <li>Error minimization through iterative optimization</li>
-                            <li>Real-time accuracy assessment and validation</li>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Informasi Tambahan -->
+                    <div class="info-box">
+                        <h6>
+                            <i class="fas fa-info-circle mr-2"></i> Informasi Perhitungan:
+                        </h6>
+                        <ul>
+                            <li><strong>Fuzzy Set:</strong> Menggunakan 6 interval (A1-A6) dengan semesta U tetap</li>
+                            <li><strong>Prediksi:</strong> Berdasarkan midpoint dari fuzzy set terakhir</li>
+                            <li><strong>Status:</strong> Naik jika prediksi > data terakhir, Turun jika sebaliknya</li>
+                            <li><strong>Tipe:</strong> Validasi (data sudah ada) atau Prediksi (data belum ada)</li>
                         </ul>
-                        <p class="mt-4">
-                            For more detailed analysis or to generate new predictions, please 
-                            <a href="{{ route('login') }}" class="text-indigo-600 hover:text-indigo-500">login to your account</a> 
-                            or <a href="{{ route('register') }}" class="text-indigo-600 hover:text-indigo-500">create a new account</a>.
-                        </p>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
+        @else
+            <div class="empty-state">
+                <i class="fas fa-chart-line"></i>
+                <h3>Tidak ada data yang tersedia</h3>
+                <p>Silakan coba ubah filter atau pilih parameter yang berbeda.</p>
+            </div>
+        @endif
 
-    <!-- Footer -->
-    <footer class="bg-gray-800 mt-12">
-        <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-            <div class="text-center">
-                <p class="text-base text-gray-400">
-                    &copy; 2024 Fuzzy System. All rights reserved.
-                </p>
+        <!-- Performance Visualization -->
+        <div class="chart-section">
+            <h4 class="chart-header">
+                <i class="fas fa-chart-area mr-2"></i>Visualisasi Performa FTS
+            </h4>
+            <div class="chart-content">
+                <canvas id="performanceChart" width="400" height="200"></canvas>
             </div>
         </div>
-    </footer>
+    </div>
 
     <script>
         // Chart initialization
         document.addEventListener('DOMContentLoaded', function() {
-            const ctx = document.getElementById('resultsChart').getContext('2d');
+            const ctx = document.getElementById('performanceChart').getContext('2d');
             
-            // Sample data for demonstration
-            const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
-            const actualData = [65, 72, 68, 75, 80, 78];
-            const predictedData = [67, 70, 69, 73, 79, 77];
-            
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
+            // Get actual data from the results
+            @if(isset($results) && count($results) > 0)
+                const results = @json($results);
+                
+                // Prepare chart data with proper data extraction
+                const chartData = {
+                    labels: results.map(item => item.nama_wilayah),
+                    datasets: [
+                        {
+                            label: 'Data Historis 2023',
+                            data: results.map(item => {
+                                const hist2023 = item.data_historis?.find(d => d.tahun == 2023);
+                                return hist2023 ? hist2023.jumlah : 0;
+                            }),
+                            backgroundColor: 'rgba(54, 162, 235, 0.8)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 2,
+                            type: 'bar',
+                            order: 2
+                        },
+                        {
+                            label: 'Data Historis 2024',
+                            data: results.map(item => {
+                                const hist2024 = item.data_historis?.find(d => d.tahun == 2024);
+                                return hist2024 ? hist2024.jumlah : 0;
+                            }),
+                            backgroundColor: 'rgba(75, 192, 192, 0.8)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 2,
+                            type: 'bar',
+                            order: 2
+                        },
+                        {
+                            label: 'Prediksi 2025',
+                            data: results.map(item => item.jumlah_perkiraan || 0),
+                            backgroundColor: 'rgba(255, 206, 86, 0.8)',
+                            borderColor: 'rgba(255, 206, 86, 1)',
+                            borderWidth: 2,
+                            type: 'bar',
+                            order: 2
+                        }
+                    ]
+                };
+
+                // Remove trend line section - no longer needed
+                // The chart will only show bar charts for historical data and predictions
+            @else
+                // Fallback to sample data if no results
+                const chartData = {
+                    labels: ['Tidak Ada Data'],
                     datasets: [{
-                        label: 'Actual Values',
-                        data: actualData,
-                        borderColor: 'rgb(59, 130, 246)',
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        label: 'Nilai Aktual',
+                        data: [0],
+                        borderColor: 'rgb(156, 163, 175)',
+                        backgroundColor: 'rgba(156, 163, 175, 0.1)',
                         tension: 0.1
                     }, {
-                        label: 'Predicted Values',
-                        data: predictedData,
-                        borderColor: 'rgb(16, 185, 129)',
-                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        label: 'Nilai Prediksi',
+                        data: [0],
+                        borderColor: 'rgb(156, 163, 175)',
+                        backgroundColor: 'rgba(156, 163, 175, 0.1)',
                         tension: 0.1
                     }]
-                },
+                };
+            @endif
+            
+            new Chart(ctx, {
+                data: chartData,
                 options: {
                     responsive: true,
                     plugins: {
+                        legend: {
+                            position: 'top',
+                        },
                         title: {
                             display: true,
-                            text: 'Fuzzy Time Series: Actual vs Predicted Values'
+                            text: 'Perbandingan Performa Fuzzy Time Series'
                         }
                     },
                     scales: {
                         y: {
-                            beginAtZero: false
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Jumlah Stunting'
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Wilayah (Tahun)'
+                            },
+                            grid: {
+                                display: false
+                            }
+
+                        }
+                    },
+                    elements: {
+                        bar: {
+                            borderRadius: 8,
+                            borderWidth: 2
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                usePointStyle: true,
+                                padding: 20,
+                                font: {
+                                    size: 12,
+                                    weight: 'bold'
+                                }
+                            }
                         }
                     }
                 }
             });
         });
     </script>
+
+    @php
+        /**
+         * Helper function untuk menghitung fuzzy set berdasarkan nilai
+         * Menggunakan semesta U tetap (Bab 3)
+         */
+        function findFuzzySet($value) {
+            // Semesta U tetap: Min = 2,775; k = 6; Ukuran interval = 11,005
+            $min = 2775;
+            $interval_size = 11005;
+            
+            if ($value <= $min) {
+                return 'A1';
+            } elseif ($value <= $min + $interval_size) {
+                return 'A2';
+            } elseif ($value <= $min + (2 * $interval_size)) {
+                return 'A3';
+            } elseif ($value <= $min + (3 * $interval_size)) {
+                return 'A4';
+            } elseif ($value <= $min + (4 * $interval_size)) {
+                return 'A5';
+            } else {
+                return 'A6';
+            }
+        }
+    @endphp
 </body>
 </html>

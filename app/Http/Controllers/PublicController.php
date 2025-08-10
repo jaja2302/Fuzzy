@@ -5,52 +5,43 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Stunting;
 use App\Models\Wilayah;
+use App\Services\FuzzyTimeSeriesService;
 
 class PublicController extends Controller
 {
-    public function results()
-    {
-        // Get sample results for demonstration
-        // In a real application, you might want to show actual results
-        $results = collect([
-            (object) [
-                'period' => 'January 2024',
-                'actual_value' => 75.2,
-                'predicted_value' => 73.8,
-                'error' => 1.4,
-                'accuracy' => 98.1
-            ],
-            (object) [
-                'period' => 'February 2024',
-                'actual_value' => 78.5,
-                'predicted_value' => 76.9,
-                'error' => 1.6,
-                'accuracy' => 98.0
-            ],
-            (object) [
-                'period' => 'March 2024',
-                'actual_value' => 82.1,
-                'predicted_value' => 80.3,
-                'error' => 1.8,
-                'accuracy' => 97.8
-            ],
-            (object) [
-                'period' => 'April 2024',
-                'actual_value' => 79.8,
-                'predicted_value' => 78.5,
-                'error' => 1.3,
-                'accuracy' => 98.4
-            ],
-            (object) [
-                'period' => 'May 2024',
-                'actual_value' => 85.2,
-                'predicted_value' => 83.7,
-                'error' => 1.5,
-                'accuracy' => 98.2
-            ]
-        ]);
+    protected $ftsService;
 
-        return view('public.results', compact('results'));
+    public function __construct(FuzzyTimeSeriesService $ftsService)
+    {
+        $this->ftsService = $ftsService;
+    }
+
+    public function results(Request $request)
+    {
+        // Get filter parameters from request
+        $wilayahId = $request->input('wilayah_id');
+        $tahunAwal = $request->input('tahun_awal', '2020');
+        $tahunAkhir = $request->input('tahun_akhir', '2024');
+        $tahunPerkiraan = $request->input('tahun_perkiraan', date('Y') + 1);
+
+        // Set tahun prediksi di service
+        $this->ftsService->setPredictionYear($tahunPerkiraan);
+
+        // Jalankan perhitungan FTS menggunakan service
+        $this->ftsService->getStuntingData($wilayahId, $tahunAwal, $tahunAkhir);
+        
+        // Gunakan method defuzzification yang sama dengan dashboard
+        $results = $this->ftsService->defuzzification();
+
+        // If no results, show empty state
+        if (empty($results)) {
+            $results = [];
+        }
+
+        // Get wilayahs for the filter dropdown
+        $wilayahs = Wilayah::where('status_aktif', true)->get();
+
+        return view('public.results', compact('results', 'wilayahs', 'tahunPerkiraan', 'tahunAwal', 'tahunAkhir', 'wilayahId'));
     }
 
     public function stuntingData()
