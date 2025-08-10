@@ -39,6 +39,7 @@ Route::middleware(['auth'])->group(function () {
     // Fuzzy Time Series routes
     Route::get('/fuzzy-time-series', [FuzzyTimeSeriesController::class, 'index'])->name('fuzzy-time-series.index');
     Route::post('/fuzzy-time-series/calculate', [FuzzyTimeSeriesController::class, 'calculate'])->name('fuzzy-time-series.calculate');
+    Route::post('/fuzzy-time-series/calculate-all', [FuzzyTimeSeriesController::class, 'calculateAllWilayah'])->name('fuzzy-time-series.calculate-all');
     Route::get('/fuzzy-time-series/data', [FuzzyTimeSeriesController::class, 'data'])->name('fuzzy-time-series.data');
     Route::get('/fuzzy-time-series/result', [FuzzyTimeSeriesController::class, 'result'])->name('fuzzy-time-series.result');
 });

@@ -39,21 +39,57 @@ class FuzzyTimeSeriesController extends Controller
             'wilayah_id' => 'nullable|exists:wilayahs,ID_Wilayah',
             'tahun_awal' => 'nullable|integer|min:2000|max:2030',
             'tahun_akhir' => 'nullable|integer|min:2000|max:2030',
+            'tahun_perkiraan' => 'nullable|integer|min:2000|max:2030',
         ]);
 
         $wilayahId = $request->input('wilayah_id');
         $tahunAwal = $request->input('tahun_awal');
         $tahunAkhir = $request->input('tahun_akhir');
+        $tahunPerkiraan = $request->input('tahun_perkiraan', date('Y') + 1);
+
+        // Set tahun prediksi di service
+        $this->ftsService->setPredictionYear($tahunPerkiraan);
 
         // Jalankan perhitungan FTS menggunakan service
-        $results = $this->ftsService->runFuzzyTimeSeries($wilayahId, $tahunAwal, $tahunAkhir);
+        $this->ftsService->getStuntingData($wilayahId, $tahunAwal, $tahunAkhir);
+        
+        // Gunakan method defuzzification yang baru (SAMA DENGAN KODE LAMA)
+        $results = $this->ftsService->defuzzification();
 
         if (empty($results)) {
             return redirect()->back()
                 ->withErrors(['message' => 'Tidak ada data stunting yang ditemukan dengan filter yang diberikan.']);
         }
 
-        return view('fuzzy-time-series.result', compact('results', 'wilayahId', 'tahunAwal', 'tahunAkhir'));
+        return view('fuzzy-time-series.result', compact('results', 'wilayahId', 'tahunAwal', 'tahunAkhir', 'tahunPerkiraan'));
+    }
+
+    /**
+     * Hitung FTS untuk semua wilayah (SAMA DENGAN KODE LAMA)
+     */
+    public function calculateAllWilayah(Request $request)
+    {
+        $request->validate([
+            'tahun_perkiraan' => 'nullable|integer|min:2000|max:2030',
+        ]);
+
+        $tahunPerkiraan = $request->input('tahun_perkiraan', date('Y') + 1);
+
+        // Set tahun prediksi di service
+        $this->ftsService->setPredictionYear($tahunPerkiraan);
+
+        // Ambil semua data wilayah
+        $this->ftsService->getStuntingData();
+        
+        // Gunakan method defuzzification yang baru (SAMA DENGAN KODE LAMA)
+        $results = $this->ftsService->defuzzification();
+
+        if (empty($results)) {
+            return redirect()->back()
+                ->withErrors(['message' => 'Tidak ada data stunting yang ditemukan.']);
+        }
+
+        return view('fuzzy-time-series.result', compact('results', 'tahunPerkiraan'));
     }
 
     public function result()
