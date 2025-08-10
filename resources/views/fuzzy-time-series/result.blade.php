@@ -71,7 +71,7 @@
                             <strong>Wilayah:</strong> 
                             @if(isset($wilayahId) && $wilayahId)
                                 @php $wilayah = \App\Models\Wilayah::where('ID_Wilayah', $wilayahId)->first() @endphp
-                                {{ $wilayah ? $wilayah->kabupaten : 'Tidak ditemukan' }}
+                                {{ $wilayah ? $wilayah->Kabupaten : 'Tidak ditemukan' }}
                             @else
                                 Semua Wilayah
                             @endif
@@ -132,16 +132,175 @@
                                     <li>Rumus: <code>Prediksi = (lower_bound + upper_bound) / 2</code></li>
                                 </ul>
                             </li>
-                            <li><strong>Perhitungan Selisih:</strong>
-                                <ul>
-                                    <li>Selisih = <code>Prediksi − Data Terakhir</code></li>
-                                    <li>Persentase = <code>(Selisih / Data Terakhir) × 100%</code></li>
-                                </ul>
-                            </li>
                         </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                        <h6><i class="fas fa-info-circle"></i> Contoh Perhitungan (Dinamis, 1 Wilayah):</h6>
-                        <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin-top: 10px;">
+    <!-- Tabel Interval Fuzzy Set -->
+    <div class="row mt-3">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5><i class="fas fa-table"></i> Tabel Interval Fuzzy Set (Semesta U Tetap):</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-sm">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Interval</th>
+                                    <th>Fuzzy Set</th>
+                                    <th>Midpoint</th>
+                                    <th>Keterangan</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>2,775 – 13,780</td>
+                                    <td><span class="badge bg-primary">A1</span></td>
+                                    <td>8,277.5</td>
+                                    <td>Rentang 2,775 hingga 13,780</td>
+                                </tr>
+                                <tr>
+                                    <td>13,780 – 24,785</td>
+                                    <td><span class="badge bg-primary">A2</span></td>
+                                    <td>19,282.5</td>
+                                    <td>Rentang 13,780 hingga 24,785</td>
+                                </tr>
+                                <tr>
+                                    <td>24,785 – 35,790</td>
+                                    <td><span class="badge bg-primary">A3</span></td>
+                                    <td>30,287.5</td>
+                                    <td>Rentang 24,785 hingga 35,790</td>
+                                </tr>
+                                <tr>
+                                    <td>35,790 – 46,795</td>
+                                    <td><span class="badge bg-primary">A4</span></td>
+                                    <td>41,292.5</td>
+                                    <td>Rentang 35,790 hingga 46,795</td>
+                                </tr>
+                                <tr>
+                                    <td>46,795 – 57,800</td>
+                                    <td><span class="badge bg-primary">A5</span></td>
+                                    <td>52,297.5</td>
+                                    <td>Rentang 46,795 hingga 57,800</td>
+                                </tr>
+                                <tr>
+                                    <td>57,800 – 68,805</td>
+                                    <td><span class="badge bg-primary">A6</span></td>
+                                    <td>63,302.5</td>
+                                    <td>Rentang 57,800 hingga 68,805</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hasil Perhitungan -->
+    <div class="row mt-3">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-warning text-white">
+                    <h5><i class="fas fa-table"></i> HASIL PERHITUNGAN FTS</h5>
+                </div>
+                <div class="card-body">
+                    @if(count($results) > 0)
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped table-hover">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th>WILAYAH</th>
+                                        <th>DATA HISTORIS</th>
+                                        <th>FUZZY SET</th>
+                                        <th>PREDIKSI {{ $tahunPerkiraan ?? date('Y') + 1 }}</th>
+                                        <th>STATUS</th>
+                                        <th>TIPE</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($results as $data)
+                                        @php
+                                            // Ambil dua data historis terakhir dengan safety check
+                                            $hist = isset($data['data_historis']) && is_array($data['data_historis']) ? $data['data_historis'] : [];
+                                            usort($hist, function ($a, $b) {
+                                                return $a['tahun'] <=> $b['tahun'];
+                                            });
+                                            $countHist = count($hist);
+                                            $prevYear = $countHist >= 2 ? $hist[$countHist - 2]['tahun'] : null;
+                                            $lastYear = $countHist >= 1 ? $hist[$countHist - 1]['tahun'] : null;
+                                            $val_t1 = $countHist >= 2 ? (int)($hist[$countHist - 2]['jumlah'] ?? 0) : 0;
+                                            $val_t2 = $countHist >= 1 ? (int)($hist[$countHist - 1]['jumlah'] ?? 0) : 0;
+
+                                            // Hitung fuzzy set menggunakan helper function
+                                            $fs_t1 = findFuzzySet($val_t1);
+                                            $fs_t2 = findFuzzySet($val_t2);
+                                            
+                                            // Hitung status dengan safety check
+                                            $selisih = $data['selisih'] ?? 0;
+                                            $statusLbl = ($selisih > 0) ? 'Naik' : 'Turun';
+                                            $statusBadge = ($statusLbl === 'Naik') ? 'bg-success' : 'bg-danger';
+                                            $rowClass = ($statusLbl === 'Naik') ? 'table-success' : 'table-danger';
+                                        @endphp
+                                        <tr class="{{ $rowClass }}">
+                                            <td>
+                                                <strong>{{ $data['nama_wilayah'] ?? 'Unknown' }}</strong><br>
+                                                <small class="text-muted">{{ $data['provinsi'] ?? 'Unknown' }}</small>
+                                            </td>
+                                            <td>
+                                                <strong>{{ $prevYear }}:</strong> {{ number_format($val_t1) }}<br>
+                                                <strong>{{ $lastYear }}:</strong> {{ number_format($val_t2) }}
+                                            </td>
+                                            <td>
+                                                <strong>{{ $prevYear }}:</strong> {{ $fs_t1 }}<br>
+                                                <strong>{{ $lastYear }}:</strong> {{ $fs_t2 }}
+                                            </td>
+                                            <td>
+                                                <strong>{{ number_format($data['jumlah_perkiraan']) }}</strong><br>
+                                                <small class="text-muted">Midpoint {{ $fs_t2 }}</small>
+                                            </td>
+                                            <td>
+                                                <span class="badge {{ $statusBadge }}">{{ $statusLbl }}</span><br>
+                                                <small class="text-muted">
+                                                    @if($data['tipe'] == 'validasi')
+                                                        Selisih: {{ number_format($data['selisih']) }}
+                                                    @else
+                                                        Selisih: {{ number_format($data['selisih']) }}
+                                                    @endif
+                                                </small>
+                                            </td>
+                                            <td>
+                                                <span class="badge {{ $data['tipe'] == 'validasi' ? 'bg-info' : 'bg-warning' }}">
+                                                    {{ ucfirst($data['tipe']) }}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Informasi Tambahan -->
+                        <div class="mt-3">
+                            <div class="alert alert-info">
+                                <h6><i class="fas fa-info-circle"></i> Informasi Perhitungan:</h6>
+                                <ul class="mb-0">
+                                    <li><strong>Fuzzy Set:</strong> Menggunakan 6 interval (A1-A6) dengan semesta U tetap</li>
+                                    <li><strong>Prediksi:</strong> Berdasarkan midpoint dari fuzzy set terakhir</li>
+                                    <li><strong>Status:</strong> Naik jika prediksi > data terakhir, Turun jika sebaliknya</li>
+                                    <li><strong>Tipe:</strong> Validasi (data sudah ada) atau Prediksi (data belum ada)</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <!-- Contoh Perhitungan Detail -->
+                        <div class="mt-3">
+                            <h6><i class="fas fa-calculator"></i> Contoh Perhitungan Detail (Wilayah Pertama):</h6>
                             @php
                                 // Ambil 1 sampel wilayah untuk contoh
                                 $sample_data = $results[0] ?? null;
@@ -203,193 +362,69 @@
                             @endphp
                             
                             @if($sample_data)
-                                <!-- Tabel Interval (Tetap - Bab 3) -->
-                                <div style="background:#ffffff;border:1px solid #e9ecef;border-radius:6px;margin-bottom:12px;">
-                                    <table class="table table-bordered table-sm" style="margin:0;">
-                                        <thead>
-                                            <tr>
-                                                <th colspan="3">Tabel III.2. Interval (Semesta U Tetap)</th>
-                                            </tr>
-                                            <tr>
-                                                <th>Interval</th>
-                                                <th>Fuzzy Set</th>
-                                                <th>Keterangan</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>2.775 – 13.780</td>
-                                                <td>A1</td>
-                                                <td>Rentang 2.775 hingga 13.780 maka A1</td>
-                                            </tr>
-                                            <tr>
-                                                <td>13.780 – 24.785</td>
-                                                <td>A2</td>
-                                                <td>Rentang 13.780 hingga 24.785 maka A2</td>
-                                            </tr>
-                                            <tr>
-                                                <td>24.785 – 35.790</td>
-                                                <td>A3</td>
-                                                <td>Rentang 24.785 hingga 35.790 maka A3</td>
-                                            </tr>
-                                            <tr>
-                                                <td>35.790 – 46.795</td>
-                                                <td>A4</td>
-                                                <td>Rentang 35.790 hingga 46.795 maka A4</td>
-                                            </tr>
-                                            <tr>
-                                                <td>46.795 – 57.800</td>
-                                                <td>A5</td>
-                                                <td>Rentang 46.795 hingga 57.800 maka A5</td>
-                                            </tr>
-                                            <tr>
-                                                <td>57.800 – 68.805</td>
-                                                <td>A6</td>
-                                                <td>Rentang 57.800 hingga 68.805 maka A6</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                                <p><strong>Wilayah:</strong> {{ $sample_data['nama_wilayah'] ?? 'Unknown' }} (contoh dinamis menggunakan 2 tahun terakhir: {{ $tahun1 }} dan {{ $tahun2 }})</p>
-                                <ul style="margin: 5px 0 0 20px;">
-                                    <li>{{ $tahun1 }}: {{ $fmt($val_t1) }} kasus</li>
-                                    <li>{{ $tahun2 }}: {{ $fmt($val_t2) }} kasus</li>
-                                    <li>Min Global = {{ $fmt($global_min) }}, Max Global = {{ $fmt($global_max_text) }}, n = 33</li>
-                                    <li>Jumlah interval (Sturges) = 1 + 3.322 × log₁₀(33) ≈ 6.04 → <strong>6</strong></li>
-                                    <li>Ukuran interval = ({{ $fmt($global_max_text) }} − {{ $fmt($global_min) }}) / 6 ≈ <strong>{{ $fmt($interval_size_dyn, 0) }}</strong></li>
-                                    <li>Keanggotaan fuzzy: {{ $tahun1 }} → <strong>{{ $fs_t1 }}</strong>, {{ $tahun2 }} → <strong>{{ $fs_t2 }}</strong></li>
-                                    @if($idx_last)
-                                        <li>Midpoint {{ $fs_t2 }} = ({{ $fmt($intervals_dyn[$idx_last]['lower'], 0) }} + {{ $fmt($intervals_dyn[$idx_last]['upper'], 0) }}) / 2 = {{ $fmt($mid_last, 0) }}</li>
-                                        <li><strong>Prediksi {{ $tahun2 + 1 }} ≈ {{ $fmt(round($mid_last)) }}</strong></li>
-                                        <li><em>Keterangan:</em> pada metode Fuzzy Time Series (Chen), nilai representatif interval ditetapkan sebagai <strong>titik tengah (midpoint)</strong>.<br>
-                                            — Jika <strong>konsekuen tunggal</strong>, maka midpoint = <code>(batas bawah + batas atas) / 2</code>.<br>
-                                            — Jika <strong>konsekuen lebih dari satu</strong>, maka prediksi = <em>rata‑rata midpoint</em> dari seluruh konsekuen: <code>Σ midpoint / jumlah konsekuen</code>. Dengan demikian pembaginya menjadi jumlah konsekuen (tidak selalu 2).<br>
-                                            — Jika <strong>tidak ada konsekuen</strong>, biasanya digunakan midpoint interval asal sebagai fallback.
-                                        </li>
-                                    @else
-                                        <li><em>Data tidak lengkap untuk prediksi contoh.</em></li>
+                                <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin-top: 10px;">
+                                    <p><strong>Wilayah:</strong> {{ $sample_data['nama_wilayah'] ?? 'Unknown' }} (contoh dinamis menggunakan 2 tahun terakhir: {{ $tahun1 }} dan {{ $tahun2 }})</p>
+                                    <ul style="margin: 5px 0 0 20px;">
+                                        <li>{{ $tahun1 }}: {{ $fmt($val_t1) }} kasus</li>
+                                        <li>{{ $tahun2 }}: {{ $fmt($val_t2) }} kasus</li>
+                                        <li>Min Global = {{ $fmt($global_min) }}, Max Global = {{ $fmt($global_max_text) }}, n = 33</li>
+                                        <li>Jumlah interval (Sturges) = 1 + 3.322 × log₁₀(33) ≈ 6.04 → <strong>6</strong></li>
+                                        <li>Ukuran interval = ({{ $fmt($global_max_text) }} − {{ $fmt($global_min) }}) / 6 ≈ <strong>{{ $fmt($interval_size_dyn, 0) }}</strong></li>
+                                        <li>Keanggotaan fuzzy: {{ $tahun1 }} → <strong>{{ $fs_t1 }}</strong>, {{ $tahun2 }} → <strong>{{ $fs_t2 }}</strong></li>
+                                        @if($idx_last)
+                                            <li>Midpoint {{ $fs_t2 }} = ({{ $fmt($intervals_dyn[$idx_last]['lower'], 0) }} + {{ $fmt($intervals_dyn[$idx_last]['upper'], 0) }}) / 2 = {{ $fmt($mid_last, 0) }}</li>
+                                            <li><strong>Prediksi {{ $tahun2 + 1 }} ≈ {{ $fmt(round($mid_last)) }}</strong></li>
+                                            <li><em>Keterangan:</em> pada metode Fuzzy Time Series (Chen), nilai representatif interval ditetapkan sebagai <strong>titik tengah (midpoint)</strong>.<br>
+                                                — Jika <strong>konsekuen tunggal</strong>, maka midpoint = <code>(batas bawah + batas atas) / 2</code>.<br>
+                                                — Jika <strong>konsekuen lebih dari satu</strong>, maka prediksi = <em>rata‑rata midpoint</em> dari seluruh konsekuen: <code>Σ midpoint / jumlah konsekuen</code>. Dengan demikian pembaginya menjadi jumlah konsekuen (tidak selalu 2).<br>
+                                                — Jika <strong>tidak ada konsekuen</strong>, biasanya digunakan midpoint interval asal sebagai fallback.
+                                            </li>
+                                        @else
+                                            <li><em>Data tidak lengkap untuk prediksi contoh.</em></li>
+                                        @endif
+                                    </ul>
+                                    
+                                    @if($fs_t1 !== '-' && $fs_t2 !== '-' && $idx_last)
+                                        @php
+                                            $relation = $fs_t1 . '->' . $fs_t2;
+                                            $lowerB = $intervals_dyn[$idx_last]['lower'];
+                                            $upperB = $intervals_dyn[$idx_last]['upper'];
+                                            $predInt = (int)round($mid_last);
+                                            $statusLbl = ($predInt > $val_t2) ? 'Naik' : 'Turun';
+                                        @endphp
+                                        <div style="background:#ffffff;border:1px solid #e9ecef;border-radius:6px;margin-top:12px;">
+                                            <table class="table table-bordered table-sm" style="margin:0;">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Fuzzy {{ $tahun1 }}</th>
+                                                        <th>Fuzzy {{ $tahun2 }}</th>
+                                                        <th>Relasi</th>
+                                                        <th>Hasil Interval</th>
+                                                        <th>Prediksi {{ $tahun2 + 1 }}</th>
+                                                        <th>Data {{ $tahun2 }}</th>
+                                                        <th>Status</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>{{ $fs_t1 }}</td>
+                                                        <td>{{ $fs_t2 }}</td>
+                                                        <td>{{ $relation }}</td>
+                                                        <td>({{ $fmt($lowerB, 0) }} + {{ $fmt($upperB, 0) }}) / 2</td>
+                                                        <td><strong>{{ $fmt($predInt) }}</strong></td>
+                                                        <td>{{ $fmt($val_t2) }}</td>
+                                                        <td><span class="badge {{ ($statusLbl === 'Naik' ? 'bg-success' : 'bg-danger') }}">{{ $statusLbl }}</span></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     @endif
-                                </ul>
-                                
-                                @if($fs_t1 !== '-' && $fs_t2 !== '-' && $idx_last)
-                                    @php
-                                        $relation = $fs_t1 . '->' . $fs_t2;
-                                        $lowerB = $intervals_dyn[$idx_last]['lower'];
-                                        $upperB = $intervals_dyn[$idx_last]['upper'];
-                                        $predInt = (int)round($mid_last);
-                                        $statusLbl = ($predInt > $val_t2) ? 'Naik' : 'Turun';
-                                    @endphp
-                                    <div style="background:#ffffff;border:1px solid #e9ecef;border-radius:6px;margin-top:12px;">
-                                        <table class="table table-bordered table-sm" style="margin:0;">
-                                            <thead>
-                                                <tr>
-                                                    <th>Fuzzy {{ $tahun1 }}</th>
-                                                    <th>Fuzzy {{ $tahun2 }}</th>
-                                                    <th>Relasi</th>
-                                                    <th>Hasil Interval</th>
-                                                    <th>Prediksi {{ $tahun2 + 1 }}</th>
-                                                    <th>Data {{ $tahun2 }}</th>
-                                                    <th>Status</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td>{{ $fs_t1 }}</td>
-                                                    <td>{{ $fs_t2 }}</td>
-                                                    <td>{{ $relation }}</td>
-                                                    <td>({{ $fmt($lowerB, 0) }} + {{ $fmt($upperB, 0) }}) / 2</td>
-                                                    <td><strong>{{ $fmt($predInt) }}</strong></td>
-                                                    <td>{{ $fmt($val_t2) }}</td>
-                                                    <td><span class="badge {{ ($statusLbl === 'Naik' ? 'bg-success' : 'bg-danger') }}">{{ $statusLbl }}</span></td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                @endif
+                                    
+                                    <small class="text-muted mt-2 d-block">Catatan: Ganti pilihan <strong>Wilayah</strong> pada form di atas untuk melihat contoh dinamis wilayah lain. Kolom <strong>Hasil Interval</strong> menampilkan nilai representatif: jika konsekuen tunggal maka <em>midpoint</em> <code>(bawah + atas)/2</code>; jika konsekuen lebih dari satu maka <em>rata‑rata midpoint</em> seluruh konsekuen (pembagi = jumlah konsekuen).</small>
+                                </div>
                             @else
                                 <p><em>Data tidak tersedia untuk contoh perhitungan.</em></p>
                             @endif
-                            
-                            <small class="text-muted">Catatan: Ganti pilihan <strong>Wilayah</strong> pada form di atas untuk melihat contoh dinamis wilayah lain. Kolom <strong>Hasil Interval</strong> menampilkan nilai representatif: jika konsekuen tunggal maka <em>midpoint</em> <code>(bawah + atas)/2</code>; jika konsekuen lebih dari satu maka <em>rata‑rata midpoint</em> seluruh konsekuen (pembagi = jumlah konsekuen).</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Hasil Perhitungan -->
-    <div class="row mt-3">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header bg-warning text-white">
-                    <h5><i class="fas fa-table"></i> HASIL PERHITUNGAN FTS</h5>
-                </div>
-                <div class="card-body">
-                    @if(count($results) > 0)
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-striped table-hover">
-                                <thead class="thead-dark">
-                                    <tr>
-                                        <th>WILAYAH</th>
-                                        <th>FUZZY T-1</th>
-                                        <th>FUZZY T</th>
-                                        <th>RELASI</th>
-                                        <th>HASIL INTERVAL</th>
-                                        <th>PREDIKSI {{ $tahunPerkiraan ?? date('Y') + 1 }}</th>
-                                        <th>DATA T-1</th>
-                                        <th>DATA T</th>
-                                        <th>STATUS</th>
-                                        <th>TIPE</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($results as $data)
-                                        @php
-                                            // Ambil dua data historis terakhir dengan safety check
-                                            $hist = isset($data['data_historis']) && is_array($data['data_historis']) ? $data['data_historis'] : [];
-                                            usort($hist, function ($a, $b) {
-                                                return $a['tahun'] <=> $b['tahun'];
-                                            });
-                                            $countHist = count($hist);
-                                            $prevYear = $countHist >= 2 ? $hist[$countHist - 2]['tahun'] : null;
-                                            $lastYear = $countHist >= 1 ? $hist[$countHist - 1]['tahun'] : null;
-                                            $val_t1 = $countHist >= 2 ? (int)($hist[$countHist - 2]['jumlah'] ?? 0) : 0;
-                                            $val_t2 = $countHist >= 1 ? (int)($hist[$countHist - 1]['jumlah'] ?? 0) : 0;
-
-                                            // Hitung fuzzy set menggunakan helper function
-                                            $fs_t1 = findFuzzySet($val_t1);
-                                            $fs_t2 = findFuzzySet($val_t2);
-                                            
-                                            // Hitung status dengan safety check
-                                            $selisih = $data['selisih'] ?? 0;
-                                            $statusLbl = ($selisih > 0) ? 'Naik' : 'Turun';
-                                            $statusBadge = ($statusLbl === 'Naik') ? 'bg-success' : 'bg-danger';
-                                            $rowClass = ($statusLbl === 'Naik') ? 'table-success' : 'table-danger';
-                                        @endphp
-                                        <tr class="{{ $rowClass }}">
-                                            <td>
-                                                <strong>{{ $data['nama_wilayah'] ?? 'Unknown' }}</strong><br>
-                                                <small class="text-muted">{{ $data['provinsi'] ?? 'Unknown' }}</small>
-                                            </td>
-                                            <td>{{ $fs_t1 }}</td>
-                                            <td>{{ $fs_t2 }}</td>
-                                            <td>{{ $fs_t1 }}->{{ $fs_t2 }}</td>
-                                            <td>Midpoint {{ $fs_t2 }}</td>
-                                            <td><strong>{{ number_format($data['jumlah_perkiraan']) }}</strong></td>
-                                            <td>{{ number_format($val_t1) }}</td>
-                                            <td>{{ number_format($val_t2) }}</td>
-                                            <td><span class="badge {{ $statusBadge }}">{{ $statusLbl }}</span></td>
-                                            <td>
-                                                <span class="badge {{ $data['tipe'] == 'validasi' ? 'bg-info' : 'bg-warning' }}">
-                                                    {{ ucfirst($data['tipe']) }}
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
                         </div>
                     @else
                         <div class="alert alert-warning">
