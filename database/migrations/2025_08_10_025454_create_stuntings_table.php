@@ -16,15 +16,7 @@ return new class extends Migration
             $table->foreignId('wilayah_id')->constrained('wilayahs')->onDelete('cascade');
             $table->integer('tahun');
             $table->integer('bulan')->nullable();
-            $table->integer('jumlah_balita');
             $table->integer('jumlah_stunting');
-            $table->decimal('persentase_stunting', 5, 2);
-            $table->decimal('tinggi_badan_ratarata', 5, 2)->nullable();
-            $table->decimal('berat_badan_ratarata', 5, 2)->nullable();
-            $table->string('kategori_stunting')->nullable();
-            $table->text('catatan')->nullable();
-            $table->string('sumber_data')->nullable();
-            $table->boolean('status_validasi')->default(false);
             $table->timestamps();
             
             $table->unique(['wilayah_id', 'tahun', 'bulan']);

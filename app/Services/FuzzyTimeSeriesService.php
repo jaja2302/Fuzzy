@@ -55,8 +55,8 @@ class FuzzyTimeSeriesService
             return [];
         }
 
-        $minValue = $this->data->min('persentase_stunting');
-        $maxValue = $this->data->max('persentase_stunting');
+        $minValue = $this->data->min('jumlah_stunting');
+        $maxValue = $this->data->max('jumlah_stunting');
         
         // Buat 7 interval (sesuai dengan contoh)
         $range = $maxValue - $minValue;
@@ -89,7 +89,7 @@ class FuzzyTimeSeriesService
         $this->fuzzySets = [];
         
         foreach ($this->data as $item) {
-            $value = $item->persentase_stunting;
+            $value = $item->jumlah_stunting;
             $fuzzySet = $this->findFuzzySet($value);
             
             $this->fuzzySets[] = [
