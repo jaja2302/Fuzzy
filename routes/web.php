@@ -8,8 +8,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PublicController;
 
 Route::get('/', function () {
-    return view('welcome');
-});
+    return view('home');
+})->name('home');
 Route::get('/clear', function () {
     Artisan::call('config:clear');
     Artisan::call('cache:clear');

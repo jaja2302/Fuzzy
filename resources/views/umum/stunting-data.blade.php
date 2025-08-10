@@ -1,368 +1,294 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Stunting - Fuzzy Time Series</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-<body class="bg-gray-50">
-    <!-- Navigation -->
-    <nav class="bg-white shadow-lg">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                        <i class="fas fa-brain text-indigo-600 text-2xl"></i>
-                    </div>
-                    <div class="ml-2 text-xl font-bold text-gray-900">Fuzzy System</div>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <a href="{{ url('/') }}" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out">
-                        <i class="fas fa-home mr-1"></i>
-                        Home
-                    </a>
-                    <a href="{{ route('umum.results') }}" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out">
-                        <i class="fas fa-chart-line mr-1"></i>
-                        Results
-                    </a>
-                    <a href="{{ route('umum.wilayah-data') }}" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out">
-                        <i class="fas fa-map-marker-alt mr-1"></i>
-                        Regional Data
-                    </a>
-                    @auth
-                        <a href="{{ url('/dashboard') }}" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out">
-                            Dashboard
-                        </a>
-                    @else
-                        <a href="{{ route('login') }}" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out">
-                            Login
-                        </a>
-                    @endauth
-                </div>
+@extends('welcome')
+
+@section('title', 'Data Stunting - FTS')
+@section('description', 'Data stunting wilayah BKKBN SUMUT')
+
+@section('content')
+<div class="container mx-auto px-4 py-8">
+    <div class="bg-white rounded-lg shadow-lg p-6">
+        <div class="flex items-center justify-between mb-6">
+            <h1 class="text-3xl font-bold text-gray-800">Data Stunting</h1>
+            <div class="flex gap-2">
+                <a href="{{ route('umum.results') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                    <i class="fas fa-chart-line mr-2"></i>
+                    Hasil Perkiraan
+                </a>
+                <a href="{{ route('umum.wilayah-data') }}" class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors">
+                    <i class="fas fa-map-marker-alt mr-2"></i>
+                    Data Wilayah
+                </a>
             </div>
         </div>
-    </nav>
 
-    <!-- Header -->
-    <div class="bg-white shadow">
-        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between">
+        <!-- Search and Filter Section -->
+        <div class="mb-6 bg-gray-50 rounded-lg p-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                    <h1 class="text-3xl font-bold text-gray-900">Public Stunting Data</h1>
-                    <p class="mt-2 text-sm text-gray-600">
-                        Explore stunting statistics and trends across different regions
-                    </p>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Cari Wilayah</label>
+                    <input type="text" id="searchWilayah" placeholder="Masukkan nama wilayah..." class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
                 </div>
-                <div class="flex space-x-3">
-                    <a href="{{ route('umum.results') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
-                        <i class="fas fa-chart-line mr-2"></i>
-                        View Results
-                    </a>
-                    <a href="{{ route('umum.wilayah-data') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
-                        <i class="fas fa-map-marker-alt mr-2"></i>
-                        Regional Data
-                    </a>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Tahun</label>
+                    <select id="filterTahun" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <option value="">Semua Tahun</option>
+                        <option value="2019">2019</option>
+                        <option value="2020">2020</option>
+                        <option value="2021">2021</option>
+                        <option value="2022">2022</option>
+                        <option value="2023">2023</option>
+                        <option value="2024">2024</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                    <select id="filterStatus" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <option value="">Semua Status</option>
+                        <option value="Tinggi">Tinggi</option>
+                        <option value="Sedang">Sedang</option>
+                        <option value="Rendah">Rendah</option>
+                    </select>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Main Content -->
-    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <!-- Statistics Cards -->
-        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-            <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="p-5">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-child text-red-600 text-3xl"></i>
-                        </div>
-                        <div class="ml-5 w-0 flex-1">
-                            <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Total Cases</dt>
-                                <dd class="text-lg font-medium text-gray-900">1,247</dd>
-                            </dl>
-                        </div>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-lg p-6 shadow-lg">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-blue-100 text-sm font-medium">Total Data</p>
+                        <p class="text-3xl font-bold">{{ $totalData ?? 0 }}</p>
+                    </div>
+                    <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                        <i class="fas fa-database text-xl"></i>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="p-5">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-percentage text-yellow-600 text-3xl"></i>
-                        </div>
-                        <div class="ml-5 w-0 flex-1">
-                            <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Prevalence Rate</dt>
-                                <dd class="text-lg font-medium text-gray-900">23.4%</dd>
-                            </dl>
-                        </div>
+            <div class="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-lg p-6 shadow-lg">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-green-100 text-sm font-medium">Rata-rata</p>
+                        <p class="text-3xl font-bold">{{ number_format($averageStunting ?? 0, 1) }}%</p>
+                    </div>
+                    <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                        <i class="fas fa-chart-line text-xl"></i>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="p-5">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-map-marker-alt text-blue-600 text-3xl"></i>
-                        </div>
-                        <div class="ml-5 w-0 flex-1">
-                            <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Regions Covered</dt>
-                                <dd class="text-lg font-medium text-gray-900">15</dd>
-                            </dl>
-                        </div>
+            <div class="bg-gradient-to-br from-yellow-500 to-yellow-600 text-white rounded-lg p-6 shadow-lg">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-yellow-100 text-sm font-medium">Tertinggi</p>
+                        <p class="text-3xl font-bold">{{ $highestStunting ?? 0 }}%</p>
+                    </div>
+                    <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                        <i class="fas fa-arrow-up text-xl"></i>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="p-5">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-calendar text-green-600 text-3xl"></i>
-                        </div>
-                        <div class="ml-5 w-0 flex-1">
-                            <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Data Period</dt>
-                                <dd class="text-lg font-medium text-gray-900">2024</dd>
-                            </dl>
-                        </div>
+            <div class="bg-gradient-to-br from-red-500 to-red-600 text-white rounded-lg p-6 shadow-lg">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-red-100 text-sm font-medium">Terendah</p>
+                        <p class="text-3xl font-bold">{{ $lowestStunting ?? 0 }}%</p>
+                    </div>
+                    <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                        <i class="fas fa-arrow-down text-xl"></i>
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <!-- Charts Section -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-            <!-- Prevalence by Region Chart -->
-            <div class="bg-white shadow rounded-lg p-6">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Stunting Prevalence by Region</h3>
-                <canvas id="regionChart" width="400" height="200"></canvas>
-            </div>
-
-            <!-- Trend Chart -->
-            <div class="bg-white shadow rounded-lg p-6">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Stunting Trend Over Time</h3>
-                <canvas id="trendChart" width="400" height="200"></canvas>
             </div>
         </div>
 
         <!-- Data Table -->
-        <div class="bg-white shadow rounded-lg">
-            <div class="px-4 py-5 sm:p-6">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Regional Stunting Data</h3>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Region</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Cases</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prevalence (%)</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Severity Level</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trend</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Jakarta Pusat</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">89</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">18.2%</td>
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Wilayah</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tahun</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Persentase Stunting</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Keterangan</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200" id="stuntingTableBody">
+                        @if(isset($stuntingData) && count($stuntingData) > 0)
+                            @foreach($stuntingData as $index => $data)
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $index + 1 }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $data->wilayah ?? 'N/A' }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $data->tahun ?? 'N/A' }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $data->persentase_stunting ?? 'N/A' }}%</td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                        Moderate
-                                    </span>
+                                    @php
+                                        $status = '';
+                                        $statusClass = '';
+                                        if (isset($data->persentase_stunting)) {
+                                            if ($data->persentase_stunting >= 30) {
+                                                $status = 'Tinggi';
+                                                $statusClass = 'bg-red-100 text-red-800';
+                                            } elseif ($data->persentase_stunting >= 20) {
+                                                $status = 'Sedang';
+                                                $statusClass = 'bg-yellow-100 text-yellow-800';
+                                            } else {
+                                                $status = 'Rendah';
+                                                $statusClass = 'bg-green-100 text-green-800';
+                                            }
+                                        }
+                                    @endphp
+                                    <span class="px-2 py-1 text-xs font-medium rounded-full {{ $statusClass }}">{{ $status }}</span>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    <span class="text-green-600"><i class="fas fa-arrow-down mr-1"></i>Decreasing</span>
-                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $data->keterangan ?? '-' }}</td>
                             </tr>
+                            @endforeach
+                        @else
                             <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Jakarta Selatan</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">156</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">25.7%</td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                        High
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    <span class="text-red-600"><i class="fas fa-arrow-up mr-1"></i>Increasing</span>
+                                <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">
+                                    Tidak ada data stunting tersedia
                                 </td>
                             </tr>
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Jakarta Barat</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">134</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">22.1%</td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                        Moderate
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    <span class="text-gray-600"><i class="fas fa-minus mr-1"></i>Stable</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Jakarta Timur</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">198</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">28.9%</td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                        High
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    <span class="text-red-600"><i class="fas fa-arrow-up mr-1"></i>Increasing</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Jakarta Utara</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">112</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">19.8%</td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                        Low
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    <span class="text-green-600"><i class="fas fa-arrow-down mr-1"></i>Decreasing</span>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                        @endif
+                    </tbody>
+                </table>
             </div>
         </div>
 
-        <!-- Additional Information -->
-        <div class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div class="bg-white shadow rounded-lg p-6">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Risk Factors</h3>
-                <ul class="space-y-3 text-sm text-gray-600">
-                    <li class="flex items-start">
-                        <i class="fas fa-exclamation-triangle text-yellow-500 mt-1 mr-3"></i>
-                        <span>Poor maternal nutrition during pregnancy</span>
-                    </li>
-                    <li class="flex items-start">
-                        <i class="fas fa-exclamation-triangle text-yellow-500 mt-1 mr-3"></i>
-                        <span>Inadequate breastfeeding practices</span>
-                    </li>
-                    <li class="flex items-start">
-                        <i class="fas fa-exclamation-triangle text-yellow-500 mt-1 mr-3"></i>
-                        <span>Limited access to healthcare services</span>
-                    </li>
-                    <li class="flex items-start">
-                        <i class="fas fa-exclamation-triangle text-yellow-500 mt-1 mr-3"></i>
-                        <span>Poor sanitation and hygiene conditions</span>
-                    </li>
-                </ul>
+        <!-- Pagination -->
+        @if(isset($stuntingData) && method_exists($stuntingData, 'links'))
+            <div class="mt-6">
+                {{ $stuntingData->links() }}
             </div>
+        @endif
+    </div>
+</div>
 
-            <div class="bg-white shadow rounded-lg p-6">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Prevention Strategies</h3>
-                <ul class="space-y-3 text-sm text-gray-600">
-                    <li class="flex items-start">
-                        <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
-                        <span>Improve maternal and child nutrition</span>
-                    </li>
-                    <li class="flex items-start">
-                        <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
-                        <span>Promote exclusive breastfeeding</span>
-                    </li>
-                    <li class="flex items-start">
-                        <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
-                        <span>Enhance healthcare access and quality</span>
-                    </li>
-                    <li class="flex items-start">
-                        <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
-                        <span>Implement community-based interventions</span>
-                    </li>
-                </ul>
+<!-- Chart Section -->
+<div class="container mx-auto px-4 py-8">
+    <div class="bg-white rounded-lg shadow-lg p-6">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6">Grafik Trend Stunting</h2>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div>
+                <h3 class="text-lg font-semibold text-gray-700 mb-4">Trend per Tahun</h3>
+                <canvas id="yearlyChart" width="400" height="200"></canvas>
+            </div>
+            <div>
+                <h3 class="text-lg font-semibold text-gray-700 mb-4">Distribusi Status</h3>
+                <canvas id="statusChart" width="400" height="200"></canvas>
             </div>
         </div>
     </div>
+</div>
+@endsection
 
-    <!-- Footer -->
-    <footer class="bg-gray-800 mt-12">
-        <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-            <div class="text-center">
-                <p class="text-base text-gray-400">
-                    &copy; 2024 Fuzzy System. Public data for educational and research purposes.
-                </p>
-            </div>
-        </div>
-    </footer>
+@section('additional_js')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Search and filter functionality
+    const searchInput = document.getElementById('searchWilayah');
+    const yearFilter = document.getElementById('filterTahun');
+    const statusFilter = document.getElementById('filterStatus');
+    const tableBody = document.getElementById('stuntingTableBody');
 
-    <script>
-        // Region Chart
-        const regionCtx = document.getElementById('regionChart').getContext('2d');
-        new Chart(regionCtx, {
-            type: 'bar',
-            data: {
-                labels: ['Jakarta Pusat', 'Jakarta Selatan', 'Jakarta Barat', 'Jakarta Timur', 'Jakarta Utara'],
-                datasets: [{
-                    label: 'Prevalence (%)',
-                    data: [18.2, 25.7, 22.1, 28.9, 19.8],
-                    backgroundColor: [
-                        'rgba(59, 130, 246, 0.8)',
-                        'rgba(239, 68, 68, 0.8)',
-                        'rgba(59, 130, 246, 0.8)',
-                        'rgba(239, 68, 68, 0.8)',
-                        'rgba(34, 197, 94, 0.8)'
-                    ],
-                    borderColor: [
-                        'rgba(59, 130, 246, 1)',
-                        'rgba(239, 68, 68, 1)',
-                        'rgba(59, 130, 246, 1)',
-                        'rgba(239, 68, 68, 1)',
-                        'rgba(34, 197, 94, 1)'
-                    ],
-                    borderWidth: 1
-                }]
+    function filterTable() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const selectedYear = yearFilter.value;
+        const selectedStatus = statusFilter.value;
+
+        const rows = tableBody.querySelectorAll('tr');
+        
+        rows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            if (cells.length === 0) return; // Skip header row
+
+            const wilayah = cells[1].textContent.toLowerCase();
+            const tahun = cells[2].textContent;
+            const status = cells[4].textContent;
+
+            const matchesSearch = wilayah.includes(searchTerm);
+            const matchesYear = !selectedYear || tahun === selectedYear;
+            const matchesStatus = !selectedStatus || status.includes(selectedStatus);
+
+            if (matchesSearch && matchesYear && matchesStatus) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    searchInput.addEventListener('input', filterTable);
+    yearFilter.addEventListener('change', filterTable);
+    statusFilter.addEventListener('change', filterTable);
+
+    // Charts
+    // Yearly Trend Chart
+    const yearlyCtx = document.getElementById('yearlyChart').getContext('2d');
+    const yearlyChart = new Chart(yearlyCtx, {
+        type: 'line',
+        data: {
+            labels: ['2019', '2020', '2021', '2022', '2023', '2024'],
+            datasets: [{
+                label: 'Rata-rata Stunting (%)',
+                data: [15.2, 16.8, 14.5, 13.9, 12.7, 11.8],
+                borderColor: 'rgb(59, 130, 246)',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Trend Stunting per Tahun'
+                }
             },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 35
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Persentase Stunting (%)'
                     }
                 }
             }
-        });
+        }
+    });
 
-        // Trend Chart
-        const trendCtx = document.getElementById('trendChart').getContext('2d');
-        new Chart(trendCtx, {
-            type: 'line',
-            data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                datasets: [{
-                    label: 'Average Prevalence (%)',
-                    data: [24.5, 23.8, 23.1, 22.7, 22.3, 21.9],
-                    borderColor: 'rgba(59, 130, 246, 1)',
-                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                    tension: 0.4,
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 30
-                    }
+    // Status Distribution Chart
+    const statusCtx = document.getElementById('statusChart').getContext('2d');
+    const statusChart = new Chart(statusCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Tinggi', 'Sedang', 'Rendah'],
+            datasets: [{
+                data: [25, 45, 30],
+                backgroundColor: [
+                    'rgb(239, 68, 68)',
+                    'rgb(245, 158, 11)',
+                    'rgb(34, 197, 94)'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Distribusi Status Stunting'
+                },
+                legend: {
+                    position: 'bottom'
                 }
             }
-        });
-    </script>
-</body>
-</html>
+        }
+    });
+});
+</script>
+@endsection

@@ -1,467 +1,287 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Wilayah - Fuzzy Time Series</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-<body class="bg-gray-50">
-    <!-- Navigation -->
-    <nav class="bg-white shadow-lg">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                        <i class="fas fa-brain text-indigo-600 text-2xl"></i>
-                    </div>
-                    <div class="ml-2 text-xl font-bold text-gray-900">Fuzzy System</div>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <a href="{{ url('/') }}" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out">
-                        <i class="fas fa-home mr-1"></i>
-                        Home
-                    </a>
-                    <a href="{{ route('umum.results') }}" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out">
-                        <i class="fas fa-chart-line mr-1"></i>
-                        Results
-                    </a>
-                    <a href="{{ route('umum.stunting-data') }}" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out">
-                        <i class="fas fa-child mr-1"></i>
-                        Stunting Data
-                    </a>
-                    @auth
-                        <a href="{{ url('/dashboard') }}" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out">
-                            Dashboard
-                        </a>
-                    @else
-                        <a href="{{ route('login') }}" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out">
-                            Login
-                        </a>
-                    @endauth
-                </div>
+@extends('welcome')
+
+@section('title', 'Data Wilayah - FTS')
+@section('description', 'Data wilayah BKKBN SUMUT')
+
+@section('content')
+<div class="container mx-auto px-4 py-8">
+    <div class="bg-white rounded-lg shadow-lg p-6">
+        <div class="flex items-center justify-between mb-6">
+            <h1 class="text-3xl font-bold text-gray-800">Data Wilayah</h1>
+            <div class="flex gap-2">
+                <a href="{{ route('umum.results') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                    <i class="fas fa-chart-line mr-2"></i>
+                    Hasil Perkiraan
+                </a>
+                <a href="{{ route('umum.stunting-data') }}" class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors">
+                    <i class="fas fa-chart-bar mr-2"></i>
+                    Data Stunting
+                </a>
             </div>
         </div>
-    </nav>
 
-    <!-- Header -->
-    <div class="bg-white shadow">
-        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between">
+        <!-- Search and Filter Section -->
+        <div class="mb-6 bg-gray-50 rounded-lg p-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                    <h1 class="text-3xl font-bold text-gray-900">Public Regional Data</h1>
-                    <p class="mt-2 text-sm text-gray-600">
-                        Explore demographic and socioeconomic data across different regions
-                    </p>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Cari Wilayah</label>
+                    <input type="text" id="searchWilayah" placeholder="Masukkan nama wilayah..." class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
                 </div>
-                <div class="flex space-x-3">
-                    <a href="{{ route('umum.results') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
-                        <i class="fas fa-chart-line mr-2"></i>
-                        View Results
-                    </a>
-                    <a href="{{ route('umum.stunting-data') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
-                        <i class="fas fa-child mr-2"></i>
-                        Stunting Data
-                    </a>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Provinsi</label>
+                    <select id="filterProvinsi" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <option value="">Semua Provinsi</option>
+                        <option value="Sumatera Utara">Sumatera Utara</option>
+                        <option value="Aceh">Aceh</option>
+                        <option value="Sumatera Barat">Sumatera Barat</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                    <select id="filterStatus" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <option value="">Semua Status</option>
+                        <option value="Aktif">Aktif</option>
+                        <option value="Non-Aktif">Non-Aktif</option>
+                    </select>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Main Content -->
-    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <!-- Statistics Cards -->
-        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-            <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="p-5">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-map-marker-alt text-blue-600 text-3xl"></i>
-                        </div>
-                        <div class="ml-5 w-0 flex-1">
-                            <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Total Regions</dt>
-                                <dd class="text-lg font-medium text-gray-900">15</dd>
-                            </dl>
-                        </div>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-lg p-6 shadow-lg">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-blue-100 text-sm font-medium">Total Wilayah</p>
+                        <p class="text-3xl font-bold">{{ $totalWilayah ?? 0 }}</p>
+                    </div>
+                    <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                        <i class="fas fa-map-marker-alt text-xl"></i>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="p-5">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-users text-green-600 text-3xl"></i>
-                        </div>
-                        <div class="ml-5 w-0 flex-1">
-                            <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Total Population</dt>
-                                <dd class="text-lg font-medium text-gray-900">2.1M</dd>
-                            </dl>
-                        </div>
+            <div class="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-lg p-6 shadow-lg">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-green-100 text-sm font-medium">Provinsi</p>
+                        <p class="text-3xl font-bold">{{ $totalProvinsi ?? 0 }}</p>
+                    </div>
+                    <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                        <i class="fas fa-flag text-xl"></i>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="p-5">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-hospital text-purple-600 text-3xl"></i>
-                        </div>
-                        <div class="ml-5 w-0 flex-1">
-                            <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Healthcare Facilities</dt>
-                                <dd class="text-lg font-medium text-gray-900">127</dd>
-                            </dl>
-                        </div>
+            <div class="bg-gradient-to-br from-yellow-500 to-yellow-600 text-white rounded-lg p-6 shadow-lg">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-yellow-100 text-sm font-medium">Kabupaten</p>
+                        <p class="text-3xl font-bold">{{ $totalKabupaten ?? 0 }}</p>
+                    </div>
+                    <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                        <i class="fas fa-building text-xl"></i>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="p-5">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-graduation-cap text-indigo-600 text-3xl"></i>
-                        </div>
-                        <div class="ml-5 w-0 flex-1">
-                            <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Education Level</dt>
-                                <dd class="text-lg font-medium text-gray-900">High</dd>
-                            </dl>
-                        </div>
+            <div class="bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-lg p-6 shadow-lg">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-purple-100 text-sm font-medium">Kecamatan</p>
+                        <p class="text-3xl font-bold">{{ $totalKecamatan ?? 0 }}</p>
+                    </div>
+                    <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                        <i class="fas fa-map text-xl"></i>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Charts Section -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-            <!-- Population Distribution Chart -->
-            <div class="bg-white shadow rounded-lg p-6">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Population Distribution by Region</h3>
-                <canvas id="populationChart" width="400" height="200"></canvas>
-            </div>
-
-            <!-- Healthcare Access Chart -->
-            <div class="bg-white shadow rounded-lg p-6">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Healthcare Access by Region</h3>
-                <canvas id="healthcareChart" width="400" height="200"></canvas>
+        <!-- Data Table -->
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Wilayah</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Provinsi</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kabupaten</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kecamatan</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Keterangan</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200" id="wilayahTableBody">
+                        @if(isset($wilayahData) && count($wilayahData) > 0)
+                            @foreach($wilayahData as $index => $data)
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $index + 1 }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $data->nama_wilayah ?? 'N/A' }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $data->provinsi ?? 'N/A' }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $data->kabupaten ?? 'N/A' }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $data->kecamatan ?? 'N/A' }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    @php
+                                        $status = $data->status ?? 'N/A';
+                                        $statusClass = $status === 'Aktif' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+                                    @endphp
+                                    <span class="px-2 py-1 text-xs font-medium rounded-full {{ $statusClass }}">{{ $status }}</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $data->keterangan ?? '-' }}</td>
+                            </tr>
+                            @endforeach
+                        @else
+                            <tr>
+                                <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">
+                                    Tidak ada data wilayah tersedia
+                                </td>
+                            </tr>
+                        @endif
+                    </tbody>
+                </table>
             </div>
         </div>
 
-        <!-- Regional Data Table -->
-        <div class="bg-white shadow rounded-lg mb-8">
-            <div class="px-4 py-5 sm:p-6">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Regional Demographic Data</h3>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Region</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Population</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Area (km²)</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Density</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Healthcare</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Education</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Jakarta Pusat</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1,056,896</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">48.13</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">21,956</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                        Excellent
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                        High
-                                    </span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Jakarta Selatan</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,226,544</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">141.27</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">15,756</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                        Good
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                        Medium
-                                    </span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Jakarta Barat</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,434,511</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">129.54</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">18,799</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                        Good
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                        Medium
-                                    </span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Jakarta Timur</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,843,816</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">187.73</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">15,154</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                        Fair
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                        Medium
-                                    </span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Jakarta Utara</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1,747,315</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">146.66</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">11,916</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                        Good
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                        High
-                                    </span>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+        <!-- Pagination -->
+        @if(isset($wilayahData) && method_exists($wilayahData, 'links'))
+            <div class="mt-6">
+                {{ $wilayahData->links() }}
             </div>
-        </div>
+        @endif
+    </div>
+</div>
 
-        <!-- Infrastructure and Services -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-            <div class="bg-white shadow rounded-lg p-6">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Infrastructure Overview</h3>
-                <div class="space-y-4">
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm text-gray-600">Roads (km)</span>
-                        <span class="text-sm font-medium text-gray-900">2,847</span>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm text-gray-600">Bridges</span>
-                        <span class="text-sm font-medium text-gray-900">156</span>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm text-gray-600">Public Transportation</span>
-                        <span class="text-sm font-medium text-gray-900">24 routes</span>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm text-gray-600">Water Supply</span>
-                        <span class="text-sm font-medium text-gray-900">98.5%</span>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm text-gray-600">Electricity Coverage</span>
-                        <span class="text-sm font-medium text-gray-900">99.8%</span>
-                    </div>
-                </div>
+<!-- Chart Section -->
+<div class="container mx-auto px-4 py-8">
+    <div class="bg-white rounded-lg shadow-lg p-6">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6">Visualisasi Data Wilayah</h2>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div>
+                <h3 class="text-lg font-semibold text-gray-700 mb-4">Distribusi per Provinsi</h3>
+                <canvas id="provinsiChart" width="400" height="200"></canvas>
             </div>
-
-            <div class="bg-white shadow rounded-lg p-6">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Social Services</h3>
-                <div class="space-y-4">
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm text-gray-600">Schools</span>
-                        <span class="text-sm font-medium text-gray-900">1,247</span>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm text-gray-600">Hospitals</span>
-                        <span class="text-sm font-medium text-gray-900">23</span>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm text-gray-600">Clinics</span>
-                        <span class="text-sm font-medium text-gray-900">104</span>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm text-gray-600">Police Stations</span>
-                        <span class="text-sm font-medium text-gray-900">45</span>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm text-gray-600">Fire Stations</span>
-                        <span class="text-sm font-medium text-gray-900">18</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Economic Indicators -->
-        <div class="bg-white shadow rounded-lg p-6 mb-8">
-            <h3 class="text-lg font-medium text-gray-900 mb-4">Economic Indicators</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="text-center">
-                    <div class="text-2xl font-bold text-indigo-600">$12,847</div>
-                    <div class="text-sm text-gray-500">Average Income</div>
-                </div>
-                <div class="text-center">
-                    <div class="text-2xl font-bold text-green-600">4.2%</div>
-                    <div class="text-sm text-gray-500">Unemployment Rate</div>
-                </div>
-                <div class="text-center">
-                    <div class="text-2xl font-bold text-blue-600">$45.2B</div>
-                    <div class="text-sm text-gray-500">GDP Contribution</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Environmental Data -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div class="bg-white shadow rounded-lg p-6">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Environmental Quality</h3>
-                <div class="space-y-4">
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm text-gray-600">Air Quality Index</span>
-                        <span class="text-sm font-medium text-yellow-600">Moderate</span>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm text-gray-600">Green Space</span>
-                        <span class="text-sm font-medium text-gray-900">12.3%</span>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm text-gray-600">Waste Management</span>
-                        <span class="text-sm font-medium text-green-600">Good</span>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm text-gray-600">Water Quality</span>
-                        <span class="text-sm font-medium text-blue-600">Fair</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white shadow rounded-lg p-6">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Development Projects</h3>
-                <div class="space-y-3">
-                    <div class="flex items-center">
-                        <i class="fas fa-tools text-blue-500 mr-3"></i>
-                        <span class="text-sm text-gray-600">Smart City Infrastructure</span>
-                    </div>
-                    <div class="flex items-center">
-                        <i class="fas fa-leaf text-green-500 mr-3"></i>
-                        <span class="text-sm text-gray-600">Green Building Initiative</span>
-                    </div>
-                    <div class="flex items-center">
-                        <i class="fas fa-wifi text-purple-500 mr-3"></i>
-                        <span class="text-sm text-gray-600">Digital Connectivity</span>
-                    </div>
-                    <div class="flex items-center">
-                        <i class="fas fa-bus text-orange-500 mr-3"></i>
-                        <span class="text-sm text-gray-600">Public Transport Enhancement</span>
-                    </div>
-                </div>
+            <div>
+                <h3 class="text-lg font-semibold text-gray-700 mb-4">Status Wilayah</h3>
+                <canvas id="statusChart" width="400" height="200"></canvas>
             </div>
         </div>
     </div>
+</div>
+@endsection
 
-    <!-- Footer -->
-    <footer class="bg-gray-800 mt-12">
-        <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-            <div class="text-center">
-                <p class="text-base text-gray-400">
-                    &copy; 2024 Fuzzy System. Public data for educational and research purposes.
-                </p>
-            </div>
-        </div>
-    </footer>
+@section('additional_js')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Search and filter functionality
+    const searchInput = document.getElementById('searchWilayah');
+    const provinsiFilter = document.getElementById('filterProvinsi');
+    const statusFilter = document.getElementById('filterStatus');
+    const tableBody = document.getElementById('wilayahTableBody');
 
-    <script>
-        // Population Distribution Chart
-        const populationCtx = document.getElementById('populationChart').getContext('2d');
-        new Chart(populationCtx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Jakarta Pusat', 'Jakarta Selatan', 'Jakarta Barat', 'Jakarta Timur', 'Jakarta Utara'],
-                datasets: [{
-                    data: [1056896, 2226544, 2434511, 2843816, 1747315],
-                    backgroundColor: [
-                        'rgba(59, 130, 246, 0.8)',
-                        'rgba(16, 185, 129, 0.8)',
-                        'rgba(245, 158, 11, 0.8)',
-                        'rgba(239, 68, 68, 0.8)',
-                        'rgba(139, 92, 246, 0.8)'
-                    ],
-                    borderColor: [
-                        'rgba(59, 130, 246, 1)',
-                        'rgba(16, 185, 129, 1)',
-                        'rgba(245, 158, 11, 1)',
-                        'rgba(239, 68, 68, 1)',
-                        'rgba(139, 92, 246, 1)'
-                    ],
-                    borderWidth: 2
-                }]
+    function filterTable() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const selectedProvinsi = provinsiFilter.value;
+        const selectedStatus = statusFilter.value;
+
+        const rows = tableBody.querySelectorAll('tr');
+        
+        rows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            if (cells.length === 0) return; // Skip header row
+
+            const wilayah = cells[1].textContent.toLowerCase();
+            const provinsi = cells[2].textContent;
+            const status = cells[5].textContent;
+
+            const matchesSearch = wilayah.includes(searchTerm);
+            const matchesProvinsi = !selectedProvinsi || provinsi === selectedProvinsi;
+            const matchesStatus = !selectedStatus || status.includes(selectedStatus);
+
+            if (matchesSearch && matchesProvinsi && matchesStatus) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    searchInput.addEventListener('input', filterTable);
+    provinsiFilter.addEventListener('change', filterTable);
+    statusFilter.addEventListener('change', filterTable);
+
+    // Charts
+    // Provinsi Distribution Chart
+    const provinsiCtx = document.getElementById('provinsiChart').getContext('2d');
+    const provinsiChart = new Chart(provinsiCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Sumatera Utara', 'Aceh', 'Sumatera Barat'],
+            datasets: [{
+                label: 'Jumlah Wilayah',
+                data: [45, 23, 18],
+                backgroundColor: [
+                    'rgba(59, 130, 246, 0.8)',
+                    'rgba(34, 197, 94, 0.8)',
+                    'rgba(245, 158, 11, 0.8)'
+                ],
+                borderColor: [
+                    'rgba(59, 130, 246, 1)',
+                    'rgba(34, 197, 94, 1)',
+                    'rgba(245, 158, 11, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Distribusi Wilayah per Provinsi'
+                }
             },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'bottom'
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Jumlah Wilayah'
                     }
                 }
             }
-        });
+        }
+    });
 
-        // Healthcare Access Chart
-        const healthcareCtx = document.getElementById('healthcareChart').getContext('2d');
-        new Chart(healthcareCtx, {
-            type: 'bar',
-            data: {
-                labels: ['Jakarta Pusat', 'Jakarta Selatan', 'Jakarta Barat', 'Jakarta Timur', 'Jakarta Utara'],
-                datasets: [{
-                    label: 'Healthcare Facilities per 100k',
-                    data: [45, 32, 28, 22, 35],
-                    backgroundColor: [
-                        'rgba(16, 185, 129, 0.8)',
-                        'rgba(59, 130, 246, 0.8)',
-                        'rgba(59, 130, 246, 0.8)',
-                        'rgba(245, 158, 11, 0.8)',
-                        'rgba(16, 185, 129, 0.8)'
-                    ],
-                    borderColor: [
-                        'rgba(16, 185, 129, 1)',
-                        'rgba(59, 130, 246, 1)',
-                        'rgba(59, 130, 246, 1)',
-                        'rgba(245, 158, 11, 1)',
-                        'rgba(16, 185, 129, 1)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 50
-                    }
+    // Status Distribution Chart
+    const statusCtx = document.getElementById('statusChart').getContext('2d');
+    const statusChart = new Chart(statusCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Aktif', 'Non-Aktif'],
+            datasets: [{
+                data: [75, 25],
+                backgroundColor: [
+                    'rgb(34, 197, 94)',
+                    'rgb(239, 68, 68)'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Status Wilayah'
+                },
+                legend: {
+                    position: 'bottom'
                 }
             }
-        });
-    </script>
-</body>
-</html>
+        }
+    });
+});
+</script>
+@endsection

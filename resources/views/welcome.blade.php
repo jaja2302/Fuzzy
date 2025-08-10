@@ -3,209 +3,306 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FTS - Fuzzy Time Series</title>
-    <meta name="description" content="Penerapan Metode Fuzzy Time Series (FTS) Pada Perkiraan Kenaikan Stunting di BKKBN SUMUT">
+    <title>@yield('title', 'FTS - Fuzzy Time Series')</title>
+    <meta name="description" content="@yield('description', 'Penerapan Metode Fuzzy Time Series (FTS) Pada Perkiraan Kenaikan Stunting di BKKBN SUMUT')">
     <meta name="author" content="Liza">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+      <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8fafc;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 0;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 300;
+        }
+        .header p {
+            margin: 10px 0 0 0;
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        .filter-section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        .filter-section h3 {
+            margin: 0 0 20px 0;
+            color: #374151;
+            font-size: 1.3rem;
+        }
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group label {
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+        }
+        .form-group select,
+        .form-group input {
+            padding: 10px 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+        .form-group select:focus,
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .filter-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(102, 126, 234, 0.4);
+        }
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+        .results-section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+        .section-header {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            padding: 20px 25px;
+            margin: 0;
+        }
+        .section-content {
+            padding: 25px;
+        }
+        .table-container {
+            overflow-x: auto;
+        }
+        .table-auto {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .table-auto th {
+            background-color: #f3f4f6;
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #374151;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        .table-auto td {
+            padding: 15px 12px;
+            border-bottom: 1px solid #e5e7eb;
+            vertical-align: top;
+        }
+        .table-auto tbody tr:hover {
+            background-color: #f9fafb;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .status-up {
+            background-color: #10b981;
+            color: white;
+        }
+        .status-down {
+            background-color: #ef4444;
+            color: white;
+        }
+        .type-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .type-validation {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .type-prediction {
+            background-color: #f59e0b;
+            color: white;
+        }
+        .chart-section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+        .chart-header {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 20px 25px;
+            margin: 0;
+        }
+        .chart-content {
+            padding: 25px;
+        }
+        .info-box {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .info-box h6 {
+            margin: 0 0 15px 0;
+            color: #1e40af;
+            font-size: 1.1rem;
+        }
+        .info-box ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .info-box li {
+            margin-bottom: 8px;
+            color: #1e40af;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b7280;
+        }
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        .empty-state h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.5rem;
+        }
+        .empty-state p {
+            margin: 0;
+            font-size: 1.1rem;
+        }
+    </style>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @yield('additional_css')
 </head>
 <body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
-        <!-- Top Header with Contact Info -->
-        <header class="bg-gradient-to-r from-green-600 to-green-700 text-white py-3">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex flex-col md:flex-row justify-between items-center">
-                    <div class="flex flex-wrap items-center gap-6 mb-4 md:mb-0">
-                        <a href="#" class="flex items-center gap-2 hover:text-green-200 transition-colors">
-                            <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
-                                <i class="fas fa-chart-line text-sm"></i>
+        <!-- Unified Header with Contact Info and Navigation -->
+        <header class="bg-gradient-to-r from-green-600 to-green-700 text-white shadow-lg sticky top-0 z-50">
+            <!-- Top section with contact info and social media -->
+            <div class="border-b border-green-500/30">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
+                    <div class="flex flex-col md:flex-row justify-between items-center">
+                        <div class="flex flex-wrap items-center gap-4 mb-2 md:mb-0">
+                            <a href="{{ route('home') }}" class="flex items-center gap-2 hover:text-green-200 transition-colors text-sm">
+                                <div class="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-chart-line text-xs"></i>
+                                </div>
+                                <span>Fuzzy Time Series</span>
+                            </a>
+                            <a href="mailto:email@gmail.com" class="flex items-center gap-2 hover:text-green-200 transition-colors text-sm">
+                                <div class="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-envelope text-xs"></i>
+                                </div>
+                                <span>Liza@gmail.com</span>
+                            </a>
+                            <a href="tel:+6281234567890" class="flex items-center gap-2 hover:text-green-200 transition-colors text-sm">
+                                <div class="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-phone text-xs"></i>
+                                </div>
+                                <span>+62 812-3456-7890</span>
+                            </a>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="flex gap-2">
+                                <a href="#" class="w-7 h-7 bg-white/20 rounded-full flex items-center justify-center hover:bg-white hover:text-green-600 transition-all">
+                                    <i class="fab fa-facebook-f text-xs"></i>
+                                </a>
+                                <a href="#" class="w-7 h-7 bg-white/20 rounded-full flex items-center justify-center hover:bg-white hover:text-green-600 transition-all">
+                                    <i class="fab fa-twitter text-xs"></i>
+                                </a>
+                                <a href="#" class="w-7 h-7 bg-white/20 rounded-full flex items-center justify-center hover:bg-white hover:text-green-600 transition-all">
+                                    <i class="fab fa-linkedin-in text-xs"></i>
+                                </a>
                             </div>
-                            <span class="text-sm">Fuzzy Time Series</span>
-                        </a>
-                        <a href="mailto:email@gmail.com" class="flex items-center gap-2 hover:text-green-200 transition-colors">
-                            <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
-                                <i class="fas fa-envelope text-sm"></i>
+                            <div class="flex items-center space-x-3">
+                                @auth
+                                    <a href="{{ url('/dashboard') }}" class="bg-white/20 hover:bg-white hover:text-green-600 text-white px-3 py-1 rounded-md text-sm font-medium transition duration-150 ease-in-out">
+                                        Dashboard
+                                    </a>
+                                    <form method="POST" action="{{ route('logout') }}" class="inline">
+                                        @csrf
+                                        <button type="submit" class="text-white/90 hover:text-white px-3 py-1 rounded-md text-sm font-medium transition duration-150 ease-in-out">
+                                            Logout
+                                        </button>
+                                    </form>
+                                @else
+                                    <a href="{{ route('login') }}" class="text-white/90 hover:text-white px-3 py-1 rounded-md text-sm font-medium transition duration-150 ease-in-out">
+                                        Login
+                                    </a>
+                                    <!-- <a href="{{ route('register') }}" class="bg-white/20 hover:bg-white hover:text-green-600 text-white px-3 py-1 rounded-md text-sm font-medium transition duration-150 ease-in-out">
+                                        Register
+                                    </a> -->
+                                @endauth
                             </div>
-                            <span class="text-sm">email@gmail.com</span>
-                        </a>
-                        <a href="tel:+6281234567890" class="flex items-center gap-2 hover:text-green-200 transition-colors">
-                            <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
-                                <i class="fas fa-phone text-sm"></i>
-                            </div>
-                            <span class="text-sm">+62 812-3456-7890</span>
-                        </a>
-                    </div>
-                    <div class="flex gap-3">
-                        <a href="#" class="w-9 h-9 bg-white/20 rounded-full flex items-center justify-center hover:bg-white hover:text-green-600 transition-all">
-                            <i class="fab fa-facebook-f"></i>
-                        </a>
-                        <a href="#" class="w-9 h-9 bg-white/20 rounded-full flex items-center justify-center hover:bg-white hover:text-green-600 transition-all">
-                            <i class="fab fa-twitter"></i>
-                        </a>
-                        <a href="#" class="w-9 h-9 bg-white/20 rounded-full flex items-center justify-center hover:bg-white hover:text-green-600 transition-all">
-                            <i class="fab fa-linkedin-in"></i>
-                        </a>
+                        </div>
                     </div>
                 </div>
             </div>
         </header>
 
-        <!-- Main Header with Logo and Title -->
-        <section class="bg-gradient-to-br from-green-500 to-green-600 text-white py-16">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                <div class="mb-8">
-                    <div class="w-20 h-20 bg-white/90 rounded-2xl shadow-lg flex items-center justify-center border-2 border-green-200 mx-auto">
-                        <img src="{{ asset('images/logo.png') }}" alt="Logo" class="w-full h-full object-contain rounded-2xl">
-                    </div>
-                </div>
-                <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
-                    Penerapan Metode Fuzzy Time Series (FTS) Pada Perkiraan Kenaikan Stunting di BKKBN SUMUT
-                </h1>
-            </div>
-        </section>
-
-        <!-- Navigation -->
-        <nav class="bg-white shadow-lg sticky top-0 z-50">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between h-16">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-chart-line text-green-600 text-2xl"></i>
-                        </div>
-                        <div class="ml-2 text-xl font-bold text-gray-900">Fuzzy Time Series</div>
-                    </div>
-                    <div class="flex items-center space-x-4">
-                        @auth
-                            <a href="{{ url('/dashboard') }}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out">
-                                Dashboard
-                            </a>
-                            <form method="POST" action="{{ route('logout') }}" class="inline">
-                                @csrf
-                                <button type="submit" class="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out">
-                                    Logout
-                                </button>
-                            </form>
-                        @else
-                            <a href="{{ route('login') }}" class="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out">
-                                Login
-                            </a>
-                            <!-- <a href="{{ route('register') }}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out">
-                                Register
-                            </a> -->
-                        @endauth
-                    </div>
-                </div>
-            </div>
-        </nav>
-
-        <!-- Hero Section -->
-        <div class="relative overflow-hidden">
-            <div class="max-w-7xl mx-auto">
-                <div class="relative z-10 pb-8 sm:pb-16 md:pb-20 lg:max-w-2xl lg:w-full lg:pb-28 xl:pb-32">
-                    <main class="mt-10 mx-auto max-w-7xl px-4 sm:mt-12 sm:px-6 md:mt-16 lg:mt-20 lg:px-8 xl:mt-28">
-                        <div class="sm:text-center lg:text-left">
-                            <h2 class="text-3xl tracking-tight font-extrabold text-gray-900 sm:text-4xl md:text-5xl">
-                                <span class="block xl:inline">Sistem Prediksi Stunting</span>
-                                <span class="block text-green-600 xl:inline">Menggunakan Fuzzy Logic</span>
-                            </h2>
-                            <p class="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
-                                Aplikasi prediksi stunting menggunakan Fuzzy Time Series untuk membantu BKKBN SUMUT dalam perencanaan program kesehatan yang lebih efektif.
-                            </p>
-                            <div class="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
-                                <div class="rounded-md shadow">
-                                    <a href="{{ route('fuzzy-time-series.index') }}" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-green-600 hover:bg-green-700 md:py-4 md:text-lg md:px-10">
-                                        <i class="fas fa-play mr-2"></i>
-                                        Coba Analisis Fuzzy
-                                    </a>
-                                </div>
-                                <div class="mt-3 sm:mt-0 sm:ml-3">
-                                    <a href="{{ route('umum.results') }}" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-green-700 bg-green-100 hover:bg-green-200 md:py-4 md:text-lg md:px-10">
-                                        <i class="fas fa-chart-line mr-2"></i>
-                                        Lihat Hasil
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </main>
-                </div>
-            </div>
-        </div>
-
-        <!-- Features Section -->
-        <div class="py-12 bg-white">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="lg:text-center">
-                    <h2 class="text-base text-green-600 font-semibold tracking-wide uppercase">Fitur</h2>
-                    <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-                        Semua yang Anda butuhkan untuk analisis fuzzy
-                    </p>
-                    <p class="mt-4 max-w-2xl text-xl text-gray-500 lg:mx-auto">
-                        Sistem komprehensif kami menyediakan semua alat yang diperlukan untuk analisis dan prediksi fuzzy time series yang efektif.
-                    </p>
-                </div>
-
-                <div class="mt-10">
-                    <div class="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10">
-                        <div class="relative">
-                            <div class="absolute flex items-center justify-center h-12 w-12 rounded-md bg-green-500 text-white">
-                                <i class="fas fa-brain text-xl"></i>
-                            </div>
-                            <p class="ml-16 text-lg leading-6 font-medium text-gray-900">Mesin Fuzzy Logic</p>
-                            <p class="mt-2 ml-16 text-base text-gray-500">
-                                Algoritma fuzzy logic canggih untuk menangani ketidakpastian dan ketidakpresisian dalam data time series.
-                            </p>
-                        </div>
-
-                        <div class="relative">
-                            <div class="absolute flex items-center justify-center h-12 w-12 rounded-md bg-green-500 text-white">
-                                <i class="fas fa-chart-line text-xl"></i>
-                            </div>
-                            <p class="ml-16 text-lg leading-6 font-medium text-gray-900">Analisis Time Series</p>
-                            <p class="mt-2 ml-16 text-base text-gray-500">
-                                Analisis time series komprehensif dengan kemampuan visualisasi dan prediksi.
-                            </p>
-                        </div>
-
-
-                        <div class="relative">
-                            <div class="absolute flex items-center justify-center h-12 w-12 rounded-md bg-green-500 text-white">
-                                <i class="fas fa-database text-xl"></i>
-                            </div>
-                            <p class="ml-16 text-lg leading-6 font-medium text-gray-900">Manajemen Data</p>
-                            <p class="mt-2 ml-16 text-base text-gray-500">
-                                Operasi CRUD yang efisien untuk mengelola data wilayah dan stunting dengan validasi penuh.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-     
-        <!-- CTA Section -->
-        <div class="bg-green-700">
-            <div class="max-w-2xl mx-auto text-center py-16 px-4 sm:py-20 sm:px-6 lg:px-8">
-                <h2 class="text-3xl font-extrabold text-white sm:text-4xl">
-                    <span class="block">Siap untuk memulai?</span>
-                    <span class="block">Mulai analisis fuzzy Anda hari ini.</span>
-                </h2>
-                <p class="mt-4 text-lg leading-6 text-green-200">
-                    Bergabunglah dengan ribuan pengguna yang mempercayai sistem fuzzy logic kami untuk prediksi dan wawasan yang akurat.
-                </p>
-                <div class="mt-8 flex justify-center">
-                    @auth
-                        <a href="{{ url('/dashboard') }}" class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-green-600 bg-white hover:bg-green-50 sm:w-auto">
-                            <i class="fas fa-tachometer-alt mr-2"></i>
-                            Ke Dashboard
-                        </a>
-                    @else
-                        <a href="{{ route('register') }}" class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-green-500 border border-transparent rounded-md hover:bg-green-600 sm:w-auto">
-                            <i class="fas fa-user-plus mr-2"></i>
-                            Mulai Sekarang
-                        </a>
-                    @endauth
-                </div>
-            </div>
-        </div>
+        <!-- Main Content Area -->
+        @yield('content')
 
         <!-- Footer -->
         <footer class="bg-gradient-to-br from-green-600 to-green-700 text-white">
@@ -217,7 +314,7 @@
                             <span class="text-xl font-bold">FTS BKKBN</span>
                         </div>
                         <p class="text-green-100 mb-6">
-                            Aplikasi prediksi stunting menggunakan Fuzzy Time Series untuk membantu BKKBN SUMUT dalam perencanaan program kesehatan yang lebih efektif.
+                        Penerapan Metode Fuzzy Time Series (FTS) Pada Perkiraan Kenaikan Stunting di BKKBN SUMUT
                         </p>
                         <div class="flex gap-3">
                             <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white hover:text-green-600 transition-all">
@@ -248,7 +345,7 @@
                         <div class="space-y-2">
                             <div class="flex items-center text-green-100">
                                 <i class="fas fa-envelope w-5 text-yellow-300"></i>
-                                <span>email@gmail.com</span>
+                                <span>Liza@gmail.com</span>
                             </div>
                             <div class="flex items-center text-green-100">
                                 <i class="fas fa-phone w-5 text-yellow-300"></i>
@@ -302,5 +399,6 @@
                 });
             });
         </script>
+        @yield('additional_js')
     </body>
 </html>
