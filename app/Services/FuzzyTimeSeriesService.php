@@ -48,33 +48,33 @@ class FuzzyTimeSeriesService
     public function getStuntingData($wilayahId = null, $tahunAwal = null, $tahunAkhir = null): Collection
     {
         $query = Stunting::with('wilayah');
-        
+
         if ($wilayahId) {
             $query->where('id_wilayah', $wilayahId);
         }
-        
+
         if ($tahunAwal) {
             $query->where('tahun', '>=', $tahunAwal);
         }
-        
+
         if ($tahunAkhir) {
             $query->where('tahun', '<=', $tahunAkhir);
         }
-        
+
         // Ambil data dan group by wilayah dan tahun untuk menghindari duplikasi
         $this->data = $query->get()
             ->groupBy('id_wilayah')
             ->map(function ($wilayahData) {
-                // Ambil data per tahun (bukan per bulan)
+                // Ambil data per tahun (bukan per bulan) dan urutkan berdasarkan tahun ASC
                 $yearlyData = $wilayahData->groupBy('tahun')->map(function ($yearData) {
                     // Ambil data pertama untuk tahun tersebut (atau bisa juga rata-rata jika diperlukan)
                     return $yearData->first();
-                });
-                
+                })->sortBy('tahun'); // Urutkan berdasarkan tahun ASC
+
                 // Ambil data pertama untuk representasi wilayah
                 $firstData = $wilayahData->first();
                 $wilayah = $firstData->wilayah;
-                
+
                 return [
                     'id_wilayah' => $firstData->id_wilayah,
                     'nama_wilayah' => $wilayah ? $wilayah->nama_wilayah : 'Unknown',
@@ -85,7 +85,7 @@ class FuzzyTimeSeriesService
                 ];
             })
             ->values();
-        
+
         return $this->data;
     }
 
@@ -103,18 +103,18 @@ class FuzzyTimeSeriesService
 
         $this->uod = [];
         $current_value = $min;
-        
+
         for ($i = 1; $i <= $jumlah_interval; $i++) {
             $is_last = ($i === $jumlah_interval);
             $next_value = $is_last ? $upper_akhir : ($current_value + $interval_size);
-            
+
             $this->uod[] = [
                 'start' => $current_value,
                 'end' => $next_value,
                 'midpoint' => ($current_value + $next_value) / 2,
                 'label' => "A$i"
             ];
-            
+
             $current_value = $next_value;
         }
 
@@ -131,11 +131,11 @@ class FuzzyTimeSeriesService
         }
 
         $this->fuzzySets = [];
-        
+
         foreach ($this->data as $item) {
             $value = $item->jumlah_stunting;
             $fuzzySet = $this->findFuzzySet($value);
-            
+
             $this->fuzzySets[] = [
                 'id' => $item->id_stunting,
                 'wilayah' => $item->wilayah->nama_wilayah ?? ($item->wilayah->Provinsi . ' - ' . $item->wilayah->Kabupaten),
@@ -161,13 +161,13 @@ class FuzzyTimeSeriesService
             $lower = $interval['start'];
             $upper = $interval['end'];
             $is_last = ($interval['label'] === 'A6'); // A6 adalah interval terakhir
-            
+
             // Konvensi batas: semua interval menggunakan [lower, upper) kecuali interval terakhir [lower, upper]
             if (($value >= $lower && $value < $upper) || ($is_last && $value >= $lower && $value <= $upper)) {
                 return $interval;
             }
         }
-        
+
         // Fallback ke interval terdekat
         return $this->uod[0];
     }
@@ -182,11 +182,11 @@ class FuzzyTimeSeriesService
         }
 
         $this->fuzzyLogicGroups = [];
-        
+
         for ($i = 0; $i < count($this->fuzzySets) - 1; $i++) {
             $current = $this->fuzzySets[$i]['fuzzy_set'];
             $next = $this->fuzzySets[$i + 1]['fuzzy_set'];
-            
+
             $this->fuzzyLogicGroups[] = [
                 'current' => $current,
                 'next' => $next,
@@ -208,12 +208,12 @@ class FuzzyTimeSeriesService
 
         $this->fuzzyRelationshipsMatrix = [];
         $relationships = collect($this->fuzzyLogicGroups)->groupBy('relationship');
-        
+
         foreach ($relationships as $relationship => $group) {
             $frequency = $group->count();
             $totalRelationships = count($this->fuzzyLogicGroups);
             $probability = $totalRelationships > 0 ? ($frequency / $totalRelationships) * 100 : 0;
-            
+
             $this->fuzzyRelationshipsMatrix[] = [
                 'relationship' => $relationship,
                 'frequency' => $frequency,
@@ -231,7 +231,7 @@ class FuzzyTimeSeriesService
     {
         // Ambil data
         $this->getStuntingData($wilayahId, $tahunAwal, $tahunAkhir);
-        
+
         if ($this->data->isEmpty()) {
             return [];
         }
@@ -241,7 +241,7 @@ class FuzzyTimeSeriesService
         $fuzzySets = $this->fuzzify();
         $fuzzyLogicGroups = $this->createFuzzyLogicGroups();
         $fuzzyRelationshipsMatrix = $this->createFuzzyRelationshipsMatrix();
-        
+
         // Gunakan method defuzzification yang baru
         $defuzzification = $this->defuzzification();
 
@@ -266,12 +266,12 @@ class FuzzyTimeSeriesService
     public function defuzzification(): array
     {
         $results = [];
-        
+
         foreach ($this->data as $wilayah) {
             $id_wilayah = $wilayah['id_wilayah'];
             $nama_wilayah = $wilayah['nama_wilayah'];
             $provinsi = $wilayah['provinsi'];
-            
+
             // Ambil data historis untuk wilayah ini dari yearly_data
             $data_historis = [];
             foreach ($wilayah['yearly_data'] as $yearData) {
@@ -280,14 +280,14 @@ class FuzzyTimeSeriesService
                     'jumlah' => (int)$yearData->jumlah_stunting
                 ];
             }
-            
+
             if (count($data_historis) < 2) {
                 continue; // Skip jika data tidak cukup
             }
-            
+
             // Cari data tahun terakhir yang tersedia
             $tahun_terakhir = max(array_column($data_historis, 'tahun'));
-            
+
             // Jika tahun tujuan sudah ada datanya, gunakan data aktual (validasi)
             $data_tujuan = null;
             foreach ($data_historis as $data) {
@@ -296,23 +296,23 @@ class FuzzyTimeSeriesService
                     break;
                 }
             }
-            
+
             if ($data_tujuan !== null) {
                 // Data tahun tujuan sudah ada, hitung selisih dengan prediksi (validasi)
-                $data_sebelum = array_filter($data_historis, function($data) {
+                $data_sebelum = array_filter($data_historis, function ($data) {
                     return $data['tahun'] < $this->predictionYear;
                 });
-                
+
                 if (count($data_sebelum) >= 2) {
-                    // Ambil 2 data terakhir sebelum tahun tujuan
-                    $data_terakhir = array_slice(array_values($data_sebelum), -2);
-                    
-                    $hasil_fts = $this->hitungFTSAlgorithm($data_terakhir);
+                    // Gunakan semua data sebelum tahun tujuan untuk mode dinamis
+                    $data_terakhir = array_values($data_sebelum);
+
+                    $hasil_fts = $this->hitungFTSAlgorithm($data_terakhir, true);
                     $jumlah_aktual = $data_tujuan['jumlah'];
                     $jumlah_perkiraan = $hasil_fts['prediksi'];
                     $selisih = $jumlah_aktual - $jumlah_perkiraan;
                     $persentase = ($jumlah_perkiraan > 0) ? (($selisih / $jumlah_perkiraan) * 100) : 0;
-                    
+
                     $results[] = [
                         'id_wilayah' => $id_wilayah,
                         'nama_wilayah' => $nama_wilayah,
@@ -337,15 +337,15 @@ class FuzzyTimeSeriesService
                     ];
                 }
             } else {
-                // Tahun tujuan belum ada, lakukan prediksi
-                $data_terakhir = array_slice($data_historis, -2);
-                
-                $hasil_fts = $this->hitungFTSAlgorithm($data_terakhir);
+                // Tahun tujuan belum ada, lakukan prediksi menggunakan semua data
+                $data_terakhir = $data_historis; // Gunakan semua data historis
+
+                $hasil_fts = $this->hitungFTSAlgorithm($data_terakhir, true);
                 $jumlah_terakhir = $data_terakhir[count($data_terakhir) - 1]['jumlah'];
                 $jumlah_perkiraan = $hasil_fts['prediksi'];
                 $selisih = $jumlah_perkiraan - $jumlah_terakhir;
                 $persentase = ($jumlah_terakhir > 0) ? (($selisih / $jumlah_terakhir) * 100) : 0;
-                
+
                 $results[] = [
                     'id_wilayah' => $id_wilayah,
                     'nama_wilayah' => $nama_wilayah,
@@ -369,14 +369,15 @@ class FuzzyTimeSeriesService
                 ];
             }
         }
-        
+
         return $results;
     }
 
     /**
      * Method untuk menghitung FTS Algorithm seperti kode lama
+     * Sekarang mendukung mode dinamis menggunakan semua data
      */
-    private function hitungFTSAlgorithm($data_historis)
+    private function hitungFTSAlgorithm($data_historis, $useDynamic = true)
     {
         // Ambil nilai-nilai dari data historis
         $nilai_historis = array_column($data_historis, 'jumlah');
@@ -421,16 +422,44 @@ class FuzzyTimeSeriesService
             $fuzzy_values[] = $fuzzy_set;
         }
 
-        // Hitung prediksi berdasarkan fuzzy set terakhir
-        $fuzzy_terakhir = end($fuzzy_values);
+        // Hitung prediksi berdasarkan mode yang dipilih
         $prediksi = 0;
+        $metode_digunakan = '';
 
-        // Cari interval yang sesuai dengan fuzzy set terakhir
-        for ($i = 1; $i <= $jumlah_interval; $i++) {
-            if ($fuzzy_sets[$i] == $fuzzy_terakhir) {
-                $prediksi = ceil($intervals[$i]['midpoint']);
-                break;
+        if ($useDynamic && count($fuzzy_values) > 2) {
+            // Mode High-Order FTS: gunakan weighted average dari semua data
+            $total_weight = 0;
+            $weighted_sum = 0;
+
+            // Berikan bobot lebih tinggi untuk data yang lebih baru
+            for ($j = 0; $j < count($fuzzy_values); $j++) {
+                $weight = ($j + 1); // Bobot linear: data terbaru mendapat bobot tertinggi
+                $fuzzy_current = $fuzzy_values[$j];
+
+                // Cari midpoint untuk fuzzy set ini
+                for ($i = 1; $i <= $jumlah_interval; $i++) {
+                    if ($fuzzy_sets[$i] == $fuzzy_current) {
+                        $weighted_sum += $intervals[$i]['midpoint'] * $weight;
+                        $total_weight += $weight;
+                        break;
+                    }
+                }
             }
+
+            $prediksi = $total_weight > 0 ? ceil($weighted_sum / $total_weight) : 0;
+            $metode_digunakan = 'High-Order FTS (Dynamic)';
+        } else {
+            // Mode Chen klasik: gunakan fuzzy set terakhir
+            $fuzzy_terakhir = end($fuzzy_values);
+
+            // Cari interval yang sesuai dengan fuzzy set terakhir
+            for ($i = 1; $i <= $jumlah_interval; $i++) {
+                if ($fuzzy_sets[$i] == $fuzzy_terakhir) {
+                    $prediksi = ceil($intervals[$i]['midpoint']);
+                    break;
+                }
+            }
+            $metode_digunakan = 'Chen Classic FTS';
         }
 
         return array(
@@ -441,7 +470,9 @@ class FuzzyTimeSeriesService
             'min' => $min,
             'max' => $upper_akhir,
             'jumlah_interval' => $jumlah_interval,
-            'interval_size' => $interval_size
+            'interval_size' => $interval_size,
+            'metode_digunakan' => $metode_digunakan,
+            'jumlah_data_digunakan' => count($fuzzy_values)
         );
     }
 
@@ -451,19 +482,19 @@ class FuzzyTimeSeriesService
     private function getHistoricalData($id_wilayah)
     {
         $data_historis = [];
-        
+
         $stuntingData = Stunting::with('wilayah')
             ->where('id_wilayah', $id_wilayah)
             ->orderBy('tahun', 'ASC')
             ->get();
-            
+
         foreach ($stuntingData as $row) {
             $data_historis[] = [
                 'tahun' => $row->tahun,
                 'jumlah' => (int)$row->jumlah_stunting
             ];
         }
-        
+
         return $data_historis;
     }
 
@@ -475,13 +506,13 @@ class FuzzyTimeSeriesService
         $totalData = $this->data->count();
         $totalWilayah = $this->data->unique('id_wilayah')->count();
         $tahunRange = $this->data->pluck('tahun')->unique()->sort();
-        
+
         $minValue = $this->data->min('jumlah_stunting');
         $maxValue = $this->data->max('jumlah_stunting');
-        
+
         $confidence = 0;
         $prediction = 0;
-        
+
         if (!empty($this->defuzzification)) {
             $confidence = $this->defuzzification['confidence'] ?? 0;
             $prediction = $this->defuzzification['predicted_value'] ?? 0;
@@ -505,13 +536,13 @@ class FuzzyTimeSeriesService
     public function getWilayahStats($wilayahId = null): array
     {
         $query = Stunting::with('wilayah');
-        
+
         if ($wilayahId) {
             $query->where('id_wilayah', $wilayahId);
         }
-        
+
         $data = $query->get();
-        
+
         return [
             'total_wilayah' => $data->unique('id_wilayah')->count(),
             'total_data' => $data->count(),

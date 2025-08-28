@@ -31,13 +31,17 @@
                                 @foreach($wilayahs as $wilayah)
                                     <option value="{{ $wilayah->ID_Wilayah }}" 
                                             {{ old('id_wilayah', $stunting->id_wilayah) == $wilayah->ID_Wilayah ? 'selected' : '' }}>
-                                        {{ $wilayah->nama_wilayah }}
+                                        {{ $wilayah->Provinsi }} - {{ $wilayah->Kabupaten }}
+                                        @if($wilayah->nama_wilayah && $wilayah->nama_wilayah != $wilayah->Provinsi . ' - ' . $wilayah->Kabupaten)
+                                            ({{ $wilayah->nama_wilayah }})
+                                        @endif
                                     </option>
                                 @endforeach
                             </select>
                             @error('id_wilayah')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
+                            <p class="mt-1 text-xs text-gray-500">Total wilayah tersedia: {{ $wilayahs->count() }}</p>
                         </div>
                         
                         <div>

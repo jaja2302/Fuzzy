@@ -30,8 +30,19 @@ class Wilayah extends Model
      */
     public function getNamaWilayahAttribute($value)
     {
-        if ($value) {
+        if ($value && !empty($value)) {
             return $value;
+        }
+        return $this->Provinsi . ' - ' . $this->Kabupaten;
+    }
+
+    /**
+     * Get the display name for forms and lists
+     */
+    public function getDisplayNameAttribute()
+    {
+        if ($this->nama_wilayah && !empty($this->nama_wilayah)) {
+            return $this->nama_wilayah;
         }
         return $this->Provinsi . ' - ' . $this->Kabupaten;
     }

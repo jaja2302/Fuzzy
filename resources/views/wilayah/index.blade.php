@@ -17,24 +17,62 @@
 
         <!-- Success/Error Messages -->
         @if(session('success'))
-            <div class="mb-6 bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg flex items-center">
-                <i class="fas fa-check-circle mr-2 text-green-600"></i>
-                {{ session('success') }}
-            </div>
+        <div class="mb-6 bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg flex items-center">
+            <i class="fas fa-check-circle mr-2 text-green-600"></i>
+            {{ session('success') }}
+        </div>
         @endif
 
         @if(session('error'))
-            <div class="mb-6 bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg flex items-center">
-                <i class="fas fa-exclamation-circle mr-2 text-red-600"></i>
-                {{ session('error') }}
-            </div>
+        <div class="mb-6 bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg flex items-center">
+            <i class="fas fa-exclamation-circle mr-2 text-red-600"></i>
+            {{ session('error') }}
+        </div>
         @endif
+
+        <!-- Search Form -->
+        <div class="mb-6 bg-white shadow-lg rounded-lg p-6">
+            <form method="GET" action="{{ route('wilayah.index') }}" class="flex gap-4 items-end">
+                <div class="flex-1">
+                    <label for="search" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-search mr-2 text-blue-600"></i>Cari Wilayah
+                    </label>
+                    <input type="text"
+                        id="search"
+                        name="search"
+                        value="{{ request('search') }}"
+                        placeholder="Masukkan nama wilayah, kabupaten, atau provinsi..."
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200">
+                </div>
+                <div class="flex gap-2">
+                    <button type="submit"
+                        class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200 flex items-center">
+                        <i class="fas fa-search mr-2"></i>Cari
+                    </button>
+                    @if(request('search'))
+                    <a href="{{ route('wilayah.index') }}"
+                        class="px-6 py-2 bg-gray-500 hover:bg-gray-600 text-white font-medium rounded-lg transition-colors duration-200 flex items-center">
+                        <i class="fas fa-times mr-2"></i>Reset
+                    </a>
+                    @endif
+                </div>
+            </form>
+        </div>
 
         <div class="bg-white shadow-lg rounded-lg overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-500 to-blue-600">
-                <h3 class="text-lg font-semibold text-white">Wilayah List</h3>
+                <div class="flex justify-between items-center">
+                    <h3 class="text-lg font-semibold text-white">Wilayah List</h3>
+                    @if(request('search'))
+                    <div class="text-white text-sm">
+                        <i class="fas fa-search mr-2"></i>
+                        Hasil pencarian untuk: <span class="font-semibold">"{{ request('search') }}"</span>
+                        <span class="ml-2 text-blue-200">({{ $wilayahs->total() }} hasil)</span>
+                    </div>
+                    @endif
+                </div>
             </div>
-            
+
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
@@ -79,13 +117,13 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @if($wilayah->status_aktif)
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                        <i class="fas fa-check-circle mr-1"></i>Active
-                                    </span>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                    <i class="fas fa-check-circle mr-1"></i>Active
+                                </span>
                                 @else
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                        <i class="fas fa-times-circle mr-1"></i>Inactive
-                                    </span>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                    <i class="fas fa-times-circle mr-1"></i>Inactive
+                                </span>
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -93,25 +131,25 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <div class="flex space-x-2">
-                                    <a href="{{ route('wilayah.show', $wilayah) }}" 
-                                       class="text-blue-600 hover:text-blue-900 transition-colors duration-200"
-                                       title="View">
+                                    <a href="{{ route('wilayah.show', $wilayah) }}"
+                                        class="text-blue-600 hover:text-blue-900 transition-colors duration-200"
+                                        title="View">
                                         <i class="fas fa-eye"></i>
                                     </a>
-                                    <a href="{{ route('wilayah.edit', $wilayah) }}" 
-                                       class="text-yellow-600 hover:text-yellow-900 transition-colors duration-200"
-                                       title="Edit">
+                                    <a href="{{ route('wilayah.edit', $wilayah) }}"
+                                        class="text-yellow-600 hover:text-yellow-900 transition-colors duration-200"
+                                        title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <form action="{{ route('wilayah.destroy', $wilayah) }}" 
-                                          method="POST" 
-                                          class="inline"
-                                          onsubmit="return confirm('Are you sure you want to delete this wilayah?')">
+                                    <form action="{{ route('wilayah.destroy', $wilayah) }}"
+                                        method="POST"
+                                        class="inline"
+                                        onsubmit="return confirm('Are you sure you want to delete this wilayah?')">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" 
-                                                class="text-red-600 hover:text-red-900 transition-colors duration-200"
-                                                title="Delete">
+                                        <button type="submit"
+                                            class="text-red-600 hover:text-red-900 transition-colors duration-200"
+                                            title="Delete">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </form>
@@ -132,7 +170,7 @@
                     </tbody>
                 </table>
             </div>
-            
+
             @if($wilayahs->hasPages())
             <div class="px-6 py-4 border-t border-gray-200">
                 <div class="flex items-center justify-between">

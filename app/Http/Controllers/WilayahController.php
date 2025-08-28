@@ -11,9 +11,27 @@ class WilayahController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $wilayahs = Wilayah::orderBy('ID_Wilayah', 'desc')->paginate(10);
+        $query = Wilayah::query();
+        
+        // Filter berdasarkan nama wilayah jika ada parameter search
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('nama_wilayah', 'LIKE', "%{$search}%")
+                  ->orWhere('Kabupaten', 'LIKE', "%{$search}%")
+                  ->orWhere('Provinsi', 'LIKE', "%{$search}%");
+            });
+        }
+        
+        $wilayahs = $query->orderBy('ID_Wilayah', 'desc')->paginate(10);
+        
+        // Append search parameter to pagination links
+        if ($request->filled('search')) {
+            $wilayahs->appends(['search' => $request->search]);
+        }
+        
         return view('wilayah.index', compact('wilayahs'));
     }
 

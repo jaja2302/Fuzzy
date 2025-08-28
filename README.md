@@ -4,330 +4,577 @@
 [![PHP](https://img.shields.io/badge/PHP-8.2+-blue.svg)](https://php.net)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.x-38B2AC.svg)](https://tailwindcss.com)
 
-Aplikasi web berbasis Laravel yang mengimplementasikan metode **Fuzzy Time Series (FTS)** untuk memprediksi kenaikan stunting di BKKBN SUMUT. Project ini dirancang untuk membantu analisis dan perencanaan program penanganan stunting berdasarkan data historis.
+## 📖 Apa Itu Program Ini?
 
-## 🚀 Fitur Utama
+Program ini adalah **aplikasi web** yang dibuat untuk membantu **BKKBN SUMUT** (Badan Kependudukan dan Keluarga Berencana Nasional Sumatera Utara) dalam **memprediksi kenaikan stunting** di wilayah mereka.
 
-- **Sistem Autentikasi**: Login, register, dan dashboard user
-- **Manajemen Data**: CRUD untuk data wilayah dan stunting
-- **Fuzzy Time Series**: Implementasi algoritma FTS untuk prediksi
-- **Dashboard Admin**: Interface untuk mengelola data dan melihat hasil
-- **Interface Publik**: Halaman untuk melihat data dan hasil prediksi
-- **Responsive Design**: Menggunakan Tailwind CSS untuk tampilan yang responsif
+**Stunting** adalah kondisi dimana anak-anak mengalami gangguan pertumbuhan yang menyebabkan tubuh mereka lebih pendek dari ukuran normal untuk usianya.
 
-## 🛠️ Teknologi yang Digunakan
+**Fuzzy Time Series (FTS)** adalah metode matematika yang digunakan untuk memprediksi masa depan berdasarkan data-data yang sudah terjadi sebelumnya. Bayangkan seperti melihat pola cuaca untuk menebak cuaca besok.
 
-- **Backend**: Laravel 12.x
-- **Database**: MySQL/PostgreSQL
-- **Frontend**: Blade templates + Tailwind CSS
-- **PHP**: 8.2+
-- **Authentication**: Laravel built-in auth system
+## 🎯 Apa yang Bisa Dilakukan Program Ini?
 
-## 📋 Prasyarat
+### 1. **Menyimpan Data Wilayah**
+- Menyimpan informasi tentang provinsi, kabupaten, dan nama wilayah
+- Contoh: Provinsi Sumatera Utara, Kabupaten Medan, Nama Wilayah: Medan Kota
 
-Sebelum menjalankan project ini, pastikan sistem Anda memiliki:
+### 2. **Menyimpan Data Stunting**
+- Mencatat berapa banyak kasus stunting di setiap wilayah setiap tahun
+- Contoh: Di Medan Kota tahun 2023 ada 150 kasus stunting
 
-- PHP 8.2 atau lebih tinggi
-- Composer
-- MySQL/PostgreSQL
-- Node.js & NPM (untuk asset compilation)
+### 3. **Memprediksi Stunting**
+- Menggunakan data masa lalu untuk menebak berapa kasus stunting yang mungkin terjadi di masa depan
+- Contoh: Jika tahun 2021 ada 100 kasus, 2022 ada 120 kasus, 2023 ada 150 kasus, maka 2024 mungkin ada 180 kasus
 
-## 🚀 Instalasi
+### 4. **Melihat Hasil**
+- Menampilkan data dalam bentuk tabel dan grafik
+- Membuat laporan untuk perencanaan program penanganan stunting
 
-### 1. Clone Repository
+## 🏗️ Bagaimana Program Ini Dibuat?
+
+### **Framework Laravel - "Rumah" Program**
+Laravel adalah seperti **"rumah"** yang sudah jadi untuk membuat program web. Kita tidak perlu membuat dari nol, tinggal pakai yang sudah ada.
+
+**File penting**: `composer.json` (berisi daftar bahan-bahan yang dibutuhkan)
+
+### **Database MySQL - "Gudang Data"**
+MySQL adalah seperti **"gudang"** tempat menyimpan semua data. Data wilayah, data stunting, data user, semuanya disimpan di sini.
+
+**File penting**: 
+- `.env` (berisi alamat gudang dan kunci masuk)
+- `database/migrations/` (berisi denah gudang)
+
+### **Frontend Tailwind CSS - "Tampilan Cantik"**
+Tailwind CSS adalah seperti **"cat dan dekorasi"** untuk membuat tampilan program terlihat bagus dan mudah digunakan.
+
+**File penting**: 
+- `tailwind.config.js` (aturan dekorasi)
+- `resources/css/` (file CSS)
+
+## 📁 Struktur File Program (Seperti Denah Rumah)
+
+```
+luckniteshoots/                    ← Ini adalah "rumah" utama program
+├── app/                          ← Ini adalah "ruang kerja" utama
+│   ├── Http/Controllers/         ← Ini adalah "otak" program
+│   │   ├── AuthController.php    ← Mengatur login, register, logout
+│   │   ├── FuzzyTimeSeriesController.php ← Mengatur perhitungan FTS
+│   │   ├── StuntingController.php ← Mengatur data stunting
+│   │   ├── WilayahController.php ← Mengatur data wilayah
+│   │   └── PublicController.php  ← Mengatur halaman publik
+│   ├── Models/                   ← Ini adalah "cetakan" data
+│   │   ├── User.php             ← Model untuk data user
+│   │   ├── Stunting.php         ← Model untuk data stunting
+│   │   └── Wilayah.php          ← Model untuk data wilayah
+│   └── Services/                 ← Ini adalah "rumah" untuk logika rumit
+│       └── FuzzyTimeSeriesService.php ← Rumus-rumus FTS
+├── database/                     ← Ini adalah "gudang data"
+│   ├── migrations/              ← Denah gudang
+│   └── seeders/                 ← Data awal yang sudah disiapkan
+├── resources/                    ← Ini adalah "bahan tampilan"
+│   └── views/                   ← Template halaman (seperti stensil)
+├── routes/                       ← Ini adalah "peta jalan" program
+│   └── web.php                  ← Semua alamat halaman program
+├── public/                       ← Ini adalah "halaman depan" yang dilihat user
+├── .env                         ← File konfigurasi (alamat gudang, kunci, dll)
+├── composer.json                ← Daftar bahan-bahan PHP yang dibutuhkan
+└── package.json                 ← Daftar bahan-bahan JavaScript yang dibutuhkan
+```
+
+## 🔧 Cara Install Program (Step by Step)
+
+### **Langkah 1: Siapkan Komputer**
+Pastikan komputer Anda sudah punya:
+- **PHP 8.2+** (seperti "mesin" untuk menjalankan program)
+- **Composer** (seperti "tukang" yang menginstall bahan-bahan)
+- **MySQL** (seperti "gudang" untuk menyimpan data)
+- **Node.js & NPM** (seperti "tukang" untuk mengatur tampilan)
+
+### **Langkah 2: Download Program**
 ```bash
-git clone <repository-url>
+# Buka Command Prompt atau Terminal
+# Ketik perintah ini untuk download program
+git clone <alamat-repository>
 cd luckniteshoots
 ```
 
-### 2. Install Dependencies
+### **Langkah 3: Install Bahan-bahan**
 ```bash
+# Install bahan-bahan PHP
 composer install
+
+# Install bahan-bahan JavaScript
 npm install
 ```
 
-### 3. Setup Environment
+### **Langkah 4: Setup Gudang Data**
 ```bash
+# Copy file konfigurasi
 cp .env.example .env
+
+# Buat kunci rahasia program
 php artisan key:generate
 ```
 
-### 4. Konfigurasi Database
-Edit file `.env` dan sesuaikan konfigurasi database:
+### **Langkah 5: Atur Gudang Data**
+Buka file `.env` dengan notepad atau editor lain, lalu ubah bagian ini:
 ```env
 DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=fts_stunting
-DB_USERNAME=root
-DB_PASSWORD=
+DB_HOST=127.0.0.1          ← Alamat gudang (biasanya localhost)
+DB_PORT=3306                ← Pintu masuk gudang
+DB_DATABASE=fts_stunting    ← Nama gudang
+DB_USERNAME=root            ← Nama pemilik gudang
+DB_PASSWORD=                ← Password gudang (kosong jika tidak ada)
 ```
 
-### 5. Jalankan Migration & Seeder
+### **Langkah 6: Buat Gudang dan Isi Data Awal**
 ```bash
+# Buat gudang sesuai denah
 php artisan migrate
+
+# Isi data awal yang sudah disiapkan
 php artisan db:seed
 ```
 
-### 6. Compile Assets
+### **Langkah 7: Siapkan Tampilan**
 ```bash
+# Compile file CSS dan JavaScript
 npm run dev
 ```
 
-### 7. Jalankan Server
+### **Langkah 8: Jalankan Program**
 ```bash
+# Jalankan server program
 php artisan serve
 ```
 
-Aplikasi akan berjalan di `http://localhost:8000`
+Sekarang buka browser dan ketik: `http://localhost:8000`
 
-## 🔐 Autentikasi
+## 🔐 Cara Kerja Login (Contoh Detail)
 
-### Login
-- **URL**: `/login`
-- **Controller**: `AuthController@showLogin` dan `AuthController@login`
-- **Method**: GET dan POST
+### **1. User Klik Tombol Login**
+User membuka halaman `/login` di browser
 
-### Register
-- **URL**: `/register`
-- **Controller**: `AuthController@showRegister` dan `AuthController@register`
-- **Method**: GET dan POST
-
-### Logout
-- **URL**: `/logout`
-- **Controller**: `AuthController@logout`
-- **Method**: POST
-
-## 📊 Struktur Database
-
-### Tabel Users
-- `id` - Primary key
-- `name` - Nama user
-- `email` - Email user (unique)
-- `password` - Password yang di-hash
-- `created_at`, `updated_at` - Timestamps
-
-### Tabel Wilayahs
-- `ID_Wilayah` - Primary key
-- `Provinsi` - Nama provinsi
-- `Kabupaten` - Nama kabupaten
-- `nama_wilayah` - Nama wilayah
-- `status_aktif` - Status aktif wilayah (boolean)
-
-### Tabel Stuntings
-- `id_stunting` - Primary key
-- `id_wilayah` - Foreign key ke tabel wilayahs
-- `tahun` - Tahun data
-- `bulan` - Bulan data
-- `jumlah_stunting` - Jumlah kasus stunting
-
-## 🎯 Fitur Fuzzy Time Series
-
-### Controller
-- **FuzzyTimeSeriesController**: Mengelola perhitungan FTS
-- **FuzzyTimeSeriesService**: Service layer untuk logika bisnis FTS
-
-### Endpoint FTS
-- `GET /fuzzy-time-series` - Halaman utama FTS
-- `POST /fuzzy-time-series/calculate` - Hitung FTS untuk wilayah tertentu
-- `POST /fuzzy-time-series/calculate-all` - Hitung FTS untuk semua wilayah
-- `GET /fuzzy-time-series/data` - Lihat data stunting
-- `GET /fuzzy-time-series/result` - Lihat hasil perhitungan
-
-### Algoritma FTS
-1. **Universe of Discourse (UoD)**: Menentukan range data
-2. **Fuzzification**: Mengkonversi data numerik ke fuzzy sets
-3. **Fuzzy Logic Groups**: Membuat kelompok logika fuzzy
-4. **Fuzzy Relationships**: Membuat relasi antar fuzzy sets
-5. **Defuzzification**: Mengkonversi hasil fuzzy ke nilai numerik
-
-## 🗺️ Manajemen Data Wilayah
-
-### Controller
-- **WilayahController**: Mengelola CRUD data wilayah
-
-### Endpoint Wilayah
-- `GET /wilayah` - Daftar semua wilayah (index)
-- `GET /wilayah/create` - Form tambah wilayah baru
-- `POST /wilayah` - Simpan wilayah baru
-- `GET /wilayah/{id}` - Detail wilayah
-- `GET /wilayah/{id}/edit` - Form edit wilayah
-- `PUT /wilayah/{id}` - Update data wilayah
-- `DELETE /wilayah/{id}` - Hapus wilayah
-
-### Field Data Wilayah
-- `Provinsi` - Nama provinsi (required, max 100 karakter)
-- `Kabupaten` - Nama kabupaten (required, max 100 karakter)
-- `nama_wilayah` - Nama wilayah (optional, max 200 karakter)
-- `status_aktif` - Status aktif wilayah (boolean, default false)
-
-### Fitur Wilayah
-- Pagination (10 data per halaman)
-- Sorting berdasarkan nama kabupaten
-- Validasi input data
-- Relasi dengan data stunting
-- Tampilan detail wilayah dengan data stunting terkait
-
-## 📊 Manajemen Data Stunting
-
-### Controller
-- **StuntingController**: Mengelola CRUD data stunting
-
-### Endpoint Stunting
-- `GET /stunting` - Daftar semua data stunting (index)
-- `GET /stunting/create` - Form tambah data stunting baru
-- `POST /stunting` - Simpan data stunting baru
-- `GET /stunting/{id}` - Detail data stunting
-- `GET /stunting/{id}/edit` - Form edit data stunting
-- `PUT /stunting/{id}` - Update data stunting
-- `DELETE /stunting/{id}` - Hapus data stunting
-
-### Field Data Stunting
-- `id_wilayah` - ID wilayah (required, harus ada di tabel wilayahs)
-- `tahun` - Tahun data (required, integer)
-- `jumlah_stunting` - Jumlah kasus stunting (required, integer)
-
-### Fitur Stunting
-- Pagination (15 data per halaman)
-- Filter berdasarkan wilayah dan tahun
-- Validasi input data
-- Pengecekan duplikasi data (wilayah + tahun)
-- Relasi dengan data wilayah
-- Sorting berdasarkan tahun (descending)
-- Dropdown pilihan wilayah saat create/edit
-
-### Validasi Data Stunting
-- `id_wilayah` harus ada di tabel wilayahs
-- `tahun` harus berupa integer
-- `jumlah_stunting` harus berupa integer
-- Tidak boleh ada data duplikat untuk wilayah dan tahun yang sama
-
-## 🗂️ Struktur Project
-
+### **2. Browser Kirim Request ke Server**
 ```
-luckniteshoots/
-├── app/
-│   ├── Http/Controllers/
-│   │   ├── AuthController.php          # Autentikasi
-│   │   ├── FuzzyTimeSeriesController.php # Controller FTS
-│   │   ├── StuntingController.php      # CRUD stunting
-│   │   ├── WilayahController.php       # CRUD wilayah
-│   │   └── PublicController.php        # Halaman publik
-│   ├── Models/
-│   │   ├── User.php                    # Model user
-│   │   ├── Stunting.php                # Model stunting
-│   │   └── Wilayah.php                 # Model wilayah
-│   └── Services/
-│       └── FuzzyTimeSeriesService.php  # Service FTS
-├── database/
-│   ├── migrations/                     # Database migrations
-│   └── seeders/                        # Database seeders
-├── resources/
-│   └── views/                          # Blade templates
-├── routes/
-│   └── web.php                         # Web routes
-└── public/                             # Public assets
+Browser → Server: "Halo, saya mau login"
+URL: http://localhost:8000/login
+Method: GET
 ```
 
-## 🔒 Middleware
+### **3. Server Terima Request**
+File `routes/web.php` mengarahkan request ke `AuthController@showLogin`
 
-- **auth**: Memastikan user sudah login
-- **admin**: Memastikan user memiliki akses admin
-
-## 🎨 Views
-
-### Auth Views
-- `auth/login.blade.php` - Halaman login
-- `auth/register.blade.php` - Halaman register
-- `auth/dashboard.blade.php` - Dashboard user
-
-### FTS Views
-- `fuzzy-time-series/index.blade.php` - Halaman utama FTS
-- `fuzzy-time-series/data.blade.php` - Tampilan data stunting
-- `fuzzy-time-series/result.blade.php` - Hasil perhitungan FTS
-
-### Admin Views
-- `stunting/index.blade.php` - Daftar data stunting dengan filter
-- `stunting/create.blade.php` - Form tambah data stunting
-- `stunting/edit.blade.php` - Form edit data stunting
-- `stunting/show.blade.php` - Detail data stunting
-- `wilayah/index.blade.php` - Daftar wilayah dengan pagination
-- `wilayah/create.blade.php` - Form tambah wilayah
-- `wilayah/edit.blade.php` - Form edit wilayah
-- `wilayah/show.blade.php` - Detail wilayah dengan data stunting terkait
-
-### Public Views
-- `umum/` - Halaman publik untuk melihat data
-
-## 📱 Cara Penggunaan
-
-### 1. Login sebagai Admin
-- Akses `/login`
-- Gunakan kredensial yang sudah dibuat
-- Setelah login, akses dashboard
-
-### 2. Manajemen Wilayah
-- **Lihat Daftar**: Akses `/wilayah` untuk melihat semua wilayah
-- **Tambah Wilayah**: Klik "Tambah Wilayah" → `/wilayah/create`
-- **Edit Wilayah**: Klik tombol edit pada baris wilayah → `/wilayah/{id}/edit`
-- **Detail Wilayah**: Klik nama wilayah → `/wilayah/{id}` (menampilkan data stunting terkait)
-- **Hapus Wilayah**: Klik tombol hapus (akan menghapus semua data stunting terkait)
-
-### 3. Manajemen Data Stunting
-- **Lihat Daftar**: Akses `/stunting` untuk melihat semua data stunting
-- **Filter Data**: Gunakan dropdown wilayah dan input tahun untuk filter
-- **Tambah Data**: Klik "Tambah Data Stunting" → `/stunting/create`
-- **Edit Data**: Klik tombol edit pada baris data → `/stunting/{id}/edit`
-- **Detail Data**: Klik tombol detail → `/stunting/{id}`
-- **Hapus Data**: Klik tombol hapus pada baris data
-
-### 4. Perhitungan Fuzzy Time Series
-- Akses `/fuzzy-time-series`
-- Pilih wilayah dan periode data yang ingin dianalisis
-- Klik "Hitung FTS" untuk wilayah tertentu atau "Hitung Semua Wilayah"
-- Lihat hasil perhitungan di halaman result
-
-## 🚀 Deployment
-
-### Production
-```bash
-composer install --optimize-autoloader --no-dev
-npm run build
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
+### **4. Controller Kerja**
+File `app/Http/Controllers/AuthController.php`:
+```php
+public function showLogin()
+{
+    // Tampilkan halaman login
+    return view('auth.login');
+}
 ```
 
-### Environment Variables
-Pastikan semua environment variables sudah diset dengan benar untuk production.
+### **5. View Ditampilkan**
+File `resources/views/auth/login.blade.php` ditampilkan ke user
 
-## 🧪 Testing
+### **6. User Isi Form dan Submit**
+User isi email dan password, lalu klik tombol "Login"
 
-```bash
-php artisan test
+### **7. Browser Kirim Data Login**
+```
+Browser → Server: "Ini email dan password saya"
+URL: http://localhost:8000/login
+Method: POST
+Data: email=user@example.com, password=123456
 ```
 
-## 📝 License
+### **8. Controller Proses Login**
+File `app/Http/Controllers/AuthController.php`:
+```php
+public function login(Request $request)
+{
+    $credentials = $request->validate([
+        'email' => 'required|email',
+        'password' => 'required'
+    ]);
 
-Project ini menggunakan license MIT.
+    if (Auth::attempt($credentials)) {
+        $request->session()->regenerate();
+        return redirect()->intended('/dashboard');
+    }
 
-## 👥 Kontributor
+    return back()->withErrors([
+        'email' => 'The provided credentials do not match our records.',
+    ])->onlyInput('email');
+}
+```
 
-- **Liza** - Developer utama
+### **9. Cek Database**
+Controller mengecek apakah email dan password ada di database:
+- Tabel: `users`
+- Kolom: `email`, `password`
 
-## 📞 Kontak
+### **10. Hasil Login**
+- **Berhasil**: User diarahkan ke `/dashboard`
+- **Gagal**: User kembali ke halaman login dengan pesan error
 
-- **Email**: email@gmail.com
-- **Phone**: +62 812-3456-7890
+## 📊 Cara Kerja Simpan Data Wilayah
 
-## 🔄 Changelog
+### **1. User Klik "Tambah Wilayah"**
+User buka halaman `/wilayah/create`
 
-### v1.0.0
-- Implementasi dasar sistem autentikasi
-- Implementasi algoritma Fuzzy Time Series
-- Manajemen data wilayah dan stunting
-- Interface admin dan publik
+### **2. Form Ditampilkan**
+File `resources/views/wilayah/create.blade.php` ditampilkan
+
+### **3. User Isi Form**
+User isi:
+- Provinsi: Sumatera Utara
+- Kabupaten: Medan
+- Nama Wilayah: Medan Kota
+- Status Aktif: ✓ (centang)
+
+### **4. User Klik "Simpan"**
+Browser kirim data ke server:
+```
+URL: http://localhost:8000/wilayah
+Method: POST
+Data: Provinsi=Sumatera Utara, Kabupaten=Medan, nama_wilayah=Medan Kota, status_aktif=1
+```
+
+### **5. Controller Terima Data**
+File `app/Http/Controllers/WilayahController.php`:
+```php
+public function store(Request $request)
+{
+    $validator = Validator::make($request->all(), [
+        'Provinsi' => 'required|string|max:100',
+        'Kabupaten' => 'required|string|max:100',
+        'nama_wilayah' => 'nullable|string|max:255',
+        'status_aktif' => 'boolean'
+    ]);
+
+    if ($validator->fails()) {
+        return redirect()->back()
+            ->withErrors($validator)
+            ->withInput();
+    }
+
+    try {
+        $wilayah = new Wilayah();
+        $wilayah->Provinsi = $request->Provinsi;
+        $wilayah->Kabupaten = $request->Kabupaten;
+        $wilayah->nama_wilayah = $request->nama_wilayah ?: $request->Provinsi . ' - ' . $request->Kabupaten;
+        $wilayah->status_aktif = $request->has('status_aktif');
+        $wilayah->save();
+
+        return redirect()->route('wilayah.index')
+            ->with('success', 'Wilayah berhasil ditambahkan!');
+    } catch (\Exception $e) {
+        return redirect()->back()
+            ->with('error', 'Terjadi kesalahan: ' . $e->getMessage())
+            ->withInput();
+    }
+}
+```
+
+### **6. Data Disimpan ke Database**
+Data masuk ke tabel `wilayahs`:
+```
+ID_Wilayah: 1
+Provinsi: Sumatera Utara
+Kabupaten: Medan
+nama_wilayah: Medan Kota
+status_aktif: 1
+created_at: 2024-01-15 10:30:00
+updated_at: 2024-01-15 10:30:00
+```
+
+### **7. User Diarahkan ke Halaman Daftar**
+User melihat halaman `/wilayah` dengan pesan "Wilayah berhasil ditambahkan"
+
+## 🧮 Cara Kerja Perhitungan FTS
+
+### **1. User Pilih Wilayah dan Klik "Hitung FTS"**
+User buka halaman `/fuzzy-time-series`, pilih wilayah "Medan Kota", klik "Hitung FTS"
+
+### **2. Controller Terima Request**
+File `app/Http/Controllers/FuzzyTimeSeriesController.php`:
+```php
+public function calculate(Request $request)
+{
+    $request->validate([
+        'wilayah_id' => 'nullable|exists:wilayahs,ID_Wilayah',
+        'tahun_awal' => 'nullable|integer|min:2000|max:2030',
+        'tahun_akhir' => 'nullable|integer|min:2000|max:2030',
+        'tahun_perkiraan' => 'nullable|integer|min:2000|max:2030',
+    ]);
+
+    $wilayahId = $request->input('wilayah_id');
+    $tahunAwal = $request->input('tahun_awal');
+    $tahunAkhir = $request->input('tahun_akhir');
+    $tahunPerkiraan = $request->input('tahun_perkiraan', date('Y') + 1);
+
+    // Set tahun prediksi di service
+    $this->ftsService->setPredictionYear($tahunPerkiraan);
+
+    // Jalankan perhitungan FTS menggunakan service
+    $this->ftsService->getStuntingData($wilayahId, $tahunAwal, $tahunAkhir);
+    
+    // Gunakan method defuzzification
+    $results = $this->ftsService->defuzzification();
+
+    if (empty($results)) {
+        return redirect()->back()
+            ->withErrors(['message' => 'Tidak ada data stunting yang ditemukan dengan filter yang diberikan.']);
+    }
+
+    return view('fuzzy-time-series.result', compact('results', 'wilayahId', 'tahunAwal', 'tahunAkhir', 'tahunPerkiraan'));
+}
+```
+
+### **3. Service FTS Kerja**
+File `app/Services/FuzzyTimeSeriesService.php`:
+```php
+public function calculate($data)
+{
+    // Langkah 1: Tentukan Universe of Discourse (UoD)
+    $min = $data->min('jumlah_stunting');
+    $max = $data->max('jumlah_stunting');
+    $uod = $this->calculateUoD($min, $max);
+
+    // Langkah 2: Fuzzification (ubah data ke fuzzy sets)
+    $fuzzySets = $this->fuzzification($data, $uod);
+
+    // Langkah 3: Buat fuzzy logic groups
+    $fuzzyGroups = $this->createFuzzyGroups($fuzzySets);
+
+    // Langkah 4: Buat fuzzy relationships
+    $relationships = $this->createRelationships($fuzzyGroups);
+
+    // Langkah 5: Defuzzification (hitung prediksi)
+    $prediction = $this->defuzzification($relationships);
+
+    return [
+        'data_asli' => $data,
+        'uod' => $uod,
+        'fuzzy_sets' => $fuzzySets,
+        'prediksi' => $prediction
+    ];
+}
+```
+
+### **4. Hasil Ditampilkan**
+File `resources/views/fuzzy-time-series/result.blade.php` menampilkan:
+- Data asli stunting
+- Perhitungan UoD
+- Fuzzy sets
+- Hasil prediksi
+
+## 🗂️ Penjelasan File-File Penting
+
+### **File Controller (Otak Program)**
+
+#### **AuthController.php** - `app/Http/Controllers/AuthController.php`
+**Fungsi**: Mengatur semua hal tentang login, register, dan logout
+**Isi**:
+- `showLogin()` - Tampilkan halaman login
+- `login()` - Proses login user
+- `showRegister()` - Tampilkan halaman register
+- `register()` - Proses register user baru
+- `logout()` - Proses logout user
+- `dashboard()` - Tampilkan dashboard user
+
+#### **WilayahController.php** - `app/Http/Controllers/WilayahController.php`
+**Fungsi**: Mengatur semua hal tentang data wilayah
+**Isi**:
+- `index()` - Tampilkan daftar semua wilayah dengan pagination dan search
+- `create()` - Tampilkan form tambah wilayah
+- `store()` - Simpan wilayah baru ke database
+- `show()` - Tampilkan detail wilayah dengan data stunting terkait
+- `edit()` - Tampilkan form edit wilayah
+- `update()` - Update data wilayah
+- `destroy()` - Hapus wilayah
+
+#### **StuntingController.php** - `app/Http/Controllers/StuntingController.php`
+**Fungsi**: Mengatur semua hal tentang data stunting
+**Isi**:
+- `index()` - Tampilkan daftar data stunting dengan filter dan pagination
+- `create()` - Tampilkan form tambah data stunting
+- `store()` - Simpan data stunting baru dengan validasi duplikasi
+- `show()` - Tampilkan detail data stunting
+- `edit()` - Tampilkan form edit data stunting
+- `update()` - Update data stunting
+- `destroy()` - Hapus data stunting
+
+#### **FuzzyTimeSeriesController.php** - `app/Http/Controllers/FuzzyTimeSeriesController.php`
+**Fungsi**: Mengatur semua hal tentang perhitungan FTS
+**Isi**:
+- `index()` - Tampilkan halaman utama FTS dengan pilihan wilayah
+- `calculate()` - Hitung FTS untuk wilayah tertentu
+- `calculateAllWilayah()` - Hitung FTS untuk semua wilayah
+- `data()` - Tampilkan data stunting untuk analisis
+- `result()` - Tampilkan hasil perhitungan
+
+### **File Model (Cetakan Data)**
+
+#### **User.php** - `app/Models/User.php`
+**Fungsi**: Model untuk data user (pengguna program)
+**Isi**:
+- `$fillable` - Kolom apa saja yang bisa diisi
+- `$hidden` - Kolom apa saja yang tidak ditampilkan
+- Relasi dengan tabel lain
+
+#### **Wilayah.php** - `app/Models/Wilayah.php`
+**Fungsi**: Model untuk data wilayah
+**Isi**:
+- `$fillable` - Kolom yang bisa diisi
+- `stuntings()` - Relasi dengan data stunting
+- `$casts` - Tipe data kolom
+
+#### **Stunting.php** - `app/Models/Stunting.php`
+**Fungsi**: Model untuk data stunting
+**Isi**:
+- `$fillable` - Kolom yang bisa diisi
+- `wilayah()` - Relasi dengan data wilayah
+- `$casts` - Tipe data kolom
+
+### **File Service (Rumus-Rumus)**
+
+#### **FuzzyTimeSeriesService.php** - `app/Services/FuzzyTimeSeriesService.php`
+**Fungsi**: Berisi semua rumus dan logika perhitungan FTS
+**Isi**:
+- `setPredictionYear()` - Set tahun untuk prediksi
+- `getStuntingData()` - Ambil data stunting sesuai filter
+- `defuzzification()` - Hitung prediksi akhir menggunakan algoritma FTS
+
+### **File Routes (Peta Jalan)**
+
+#### **web.php** - `routes/web.php`
+**Fungsi**: Berisi semua alamat halaman program
+**Contoh isi**:
+```php
+// Halaman login
+Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+
+// Halaman wilayah
+Route::resource('wilayah', WilayahController::class);
+
+// Halaman stunting
+Route::resource('stunting', StuntingController::class)->parameters([
+    'stunting' => 'id_stunting'
+]);
+
+// Halaman FTS
+Route::get('/fuzzy-time-series', [FuzzyTimeSeriesController::class, 'index']);
+Route::post('/fuzzy-time-series/calculate', [FuzzyTimeSeriesController::class, 'calculate']);
+Route::post('/fuzzy-time-series/calculate-all', [FuzzyTimeSeriesController::class, 'calculateAllWilayah']);
+```
+
+### **File View (Template Halaman)**
+
+#### **login.blade.php** - `resources/views/auth/login.blade.php`
+**Fungsi**: Template untuk halaman login
+**Isi**: HTML + Tailwind CSS untuk form login
+
+#### **wilayah/index.blade.php** - `resources/views/wilayah/index.blade.php`
+**Fungsi**: Template untuk halaman daftar wilayah
+**Isi**: Tabel daftar wilayah dengan search, pagination, dan tombol tambah, edit, hapus
+
+#### **stunting/create.blade.php** - `resources/views/stunting/create.blade.php`
+**Fungsi**: Template untuk form tambah data stunting
+**Isi**: Form input untuk data stunting dengan dropdown pilihan wilayah
+
+#### **fuzzy-time-series/index.blade.php** - `resources/views/fuzzy-time-series/index.blade.php`
+**Fungsi**: Template untuk halaman utama FTS
+**Isi**: Form pilihan wilayah dan parameter untuk perhitungan FTS
+
+## 🔍 Cara Debug (Troubleshooting)
+
+### **Program Tidak Bisa Dibuka**
+1. **Cek apakah server jalan**:
+   ```bash
+   php artisan serve
+   ```
+   Pastikan ada pesan "Server running on http://localhost:8000"
+
+2. **Cek file .env**:
+   Pastikan file `.env` ada dan berisi konfigurasi yang benar
+
+3. **Cek database**:
+   Pastikan MySQL jalan dan database `fts_stunting` sudah dibuat
+
+### **Error "Class not found"**
+1. **Install ulang dependencies**:
+   ```bash
+   composer install
+   ```
+
+2. **Clear cache**:
+   ```bash
+   php artisan config:clear
+   php artisan cache:clear
+   ```
+
+### **Halaman Kosong atau Error**
+1. **Cek log error**:
+   File `storage/logs/laravel.log`
+
+2. **Cek apakah database ada data**:
+   ```bash
+   php artisan tinker
+   >>> App\Models\Wilayah::count();
+   >>> App\Models\Stunting::count();
+   ```
+
+## 📚 Istilah-Istilah Programming yang Perlu Diketahui
+
+### **Backend vs Frontend**
+- **Backend**: Bagian program yang tidak terlihat (database, logika)
+- **Frontend**: Bagian program yang terlihat (halaman web, tombol)
+
+### **Controller**
+Seperti "otak" yang mengatur apa yang harus dilakukan program
+
+### **Model**
+Seperti "cetakan" untuk data yang disimpan di database
+
+### **View**
+Seperti "template" atau "stensil" untuk tampilan halaman
+
+### **Route**
+Seperti "alamat" atau "peta jalan" untuk mengarahkan user ke halaman yang benar
+
+### **Migration**
+Seperti "denah" untuk membuat struktur database
+
+### **Seeder**
+Seperti "data awal" yang sudah disiapkan untuk testing
+
+### **Middleware**
+Seperti "penjaga" yang memeriksa apakah user boleh masuk ke halaman tertentu
+
+## 🎯 Kesimpulan
+
+Program ini adalah aplikasi web yang dibuat dengan:
+1. **Laravel** sebagai framework utama
+2. **MySQL** sebagai database
+3. **Tailwind CSS** untuk tampilan
+4. **Fuzzy Time Series** untuk perhitungan prediksi
+
+Program ini membantu BKKBN SUMUT untuk:
+1. **Menyimpan** data wilayah dan stunting
+2. **Menganalisis** pola data stunting
+3. **Memprediksi** kemungkinan stunting di masa depan
+4. **Membuat laporan** untuk perencanaan program
+
+Untuk menjalankan program:
+1. Install semua bahan yang dibutuhkan
+2. Setup database
+3. Jalankan `php artisan serve`
+4. Buka browser ke `http://localhost:8000`
 
 ---
 
-**Note**: Project ini dikembangkan untuk keperluan akademis dan implementasi metode Fuzzy Time Series dalam konteks kesehatan masyarakat.
+**Note**: Program ini dibuat untuk keperluan akademis dan implementasi metode Fuzzy Time Series dalam konteks kesehatan masyarakat. Jika ada pertanyaan atau masalah, bisa dicek di file log atau hubungi developer.
